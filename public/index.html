@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CubeMatel Online</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        max-width: 900px;
+      }
+
+      button,
+      input,
+      select {
+        margin: 4px;
+      }
+
+      .panel {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 12px;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>CubeMatel Online</h1>
+
+    <div class="panel">
+      <h2>Mon cube</h2>
+      <button data-move="shake">Secouer</button>
+      <button data-move="flip">Retourner</button>
+      <button data-move="tilt">Incliner</button>
+      <button data-move="play">Jouer</button>
+    </div>
+
+    <div class="panel">
+      <h2>Connecter deux cubes</h2>
+      <input id="targetId" placeholder="ID du cube cible" />
+      <select id="direction">
+        <option value="horizontal">Horizontal</option>
+        <option value="vertical">Vertical</option>
+      </select>
+      <button id="connectBtn">Connecter</button>
+    </div>
+
+    <div class="panel">
+      <h2>Cubes connectés</h2>
+      <ul id="cubes"></ul>
+    </div>
+
+    <div class="panel">
+      <h2>Vie de la ville</h2>
+      <ul id="history"></ul>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+      const cubesList = document.getElementById("cubes");
+      const historyList = document.getElementById("history");
+
+      document.querySelectorAll("[data-move]").forEach((button) => {
+        button.addEventListener("click", () => {
+          socket.emit("cube:move", { movement: button.dataset.move });
+        });
+      });
+
+      document.getElementById("connectBtn").addEventListener("click", () => {
+        const targetId = document.getElementById("targetId").value.trim();
+        const direction = document.getElementById("direction").value;
+        if (!targetId) {
+          return;
+        }
+        socket.emit("cubes:connect", { targetId, direction });
+      });
+
+      socket.on("world:update", (state) => {
+        cubesList.innerHTML = "";
+        state.cubes.forEach((cube) => {
+          const li = document.createElement("li");
+          li.textContent = `${cube.id.slice(0, 6)} | ${cube.character} | ${cube.emotion} | ${cube.activity} | voisins: ${cube.connectedTo.join(", ") || "aucun"}`;
+          cubesList.appendChild(li);
+        });
+
+        historyList.innerHTML = "";
+        state.history
+          .slice()
+          .reverse()
+          .forEach((entry) => {
+            const li = document.createElement("li");
+            li.textContent = entry.text;
+            historyList.appendChild(li);
+          });
+      });
+    </script>
+  </body>
+</html>
