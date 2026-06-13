@@ -63,14 +63,16 @@
           <div class="world-header">
             <div>
               <h2>La ville des cubes</h2>
-              <p class="hint">Une galerie visuelle en temps réel des cubes connectés.</p>
+              <p class="hint">Une vraie scène 2D temps réel avec animation de masse.</p>
             </div>
             <div class="world-stats">
               <div class="stat-pill" id="cubeCount">0 cube</div>
               <div class="stat-pill" id="linkCount">0 lien</div>
             </div>
           </div>
-          <div class="cube-grid" id="cubeGrid"></div>
+          <div class="scene-wrap">
+            <div class="cube-scene" id="cubeScene" aria-label="Scène 2D des cubes"></div>
+          </div>
         </section>
       </div>
 
@@ -81,6 +83,7 @@
     </main>
 
     <script src="/socket.io/socket.io.js"></script>
+    <script src="/vendor/pixi.js/dist/pixi.min.js"></script>
     <script src="/app.js"></script>
   </body>
 </html>
