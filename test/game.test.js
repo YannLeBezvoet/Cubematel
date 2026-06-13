@@ -44,3 +44,23 @@ test("une connexion verticale place le cube au dessus ou en dessous", () => {
   assert.equal(cubeB.x, cubeA.x);
   assert.equal(Math.abs(cubeB.y - cubeA.y), 1);
 });
+
+test("une connexion verticale réaligne aussi des cubes sans coordonnées", () => {
+  const game = new CubeWorldGame();
+  game.createCube("a", "Alice", "Dodger");
+  game.createCube("b", "Bob", "Whip");
+  const cubeA = game.cubes.get("a");
+  const cubeB = game.cubes.get("b");
+  delete cubeA.x;
+  delete cubeA.y;
+  delete cubeB.x;
+  delete cubeB.y;
+
+  game.connectCubes("a", "b", "vertical");
+  const state = game.getState();
+  const alignedA = state.cubes.find((cube) => cube.id === "a");
+  const alignedB = state.cubes.find((cube) => cube.id === "b");
+
+  assert.equal(alignedB.x, alignedA.x);
+  assert.equal(Math.abs(alignedB.y - alignedA.y), 1);
+});

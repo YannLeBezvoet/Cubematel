@@ -196,6 +196,9 @@ function layoutCubes(sceneState, cubes) {
   const centerY = height / 2;
   const gapX = 110;
   const gapY = 110;
+  const myCube = cubes.find((cube) => cube.id === sceneState.myCubeId);
+  const originX = Number.isFinite(myCube?.x) ? myCube.x : 0;
+  const originY = Number.isFinite(myCube?.y) ? myCube.y : 0;
 
   cubes.forEach((cube, index) => {
     const node = sceneState.cubeNodes.get(cube.id);
@@ -204,8 +207,8 @@ function layoutCubes(sceneState, cubes) {
     }
     const x = Number.isFinite(cube.x) ? cube.x : index;
     const y = Number.isFinite(cube.y) ? cube.y : 0;
-    node.targetX = centerX + x * gapX;
-    node.targetY = centerY + y * gapY;
+    node.targetX = centerX + (x - originX) * gapX;
+    node.targetY = centerY + (y - originY) * gapY;
   });
 }
 

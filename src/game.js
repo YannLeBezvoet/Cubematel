@@ -94,6 +94,7 @@ class CubeWorldGame {
       return;
     }
 
+    this._ensureAllCoordinates();
     const orientation = direction === "vertical" ? "verticalement" : "horizontalement";
     const key = [sourceId, targetId].sort().join("::");
     this.links.add(key);
@@ -109,6 +110,7 @@ class CubeWorldGame {
   }
 
   getState() {
+    this._ensureAllCoordinates();
     return {
       cubes: [...this.cubes.values()],
       history: this.history.slice(-20),
@@ -132,16 +134,27 @@ class CubeWorldGame {
     });
   }
 
-  _findFirstFreeCoordinate() {
+  _findFirstFreeCoordinate(ignoredCubeId) {
     const searchLimit = this.cubes.size + 2;
     for (let y = -searchLimit; y <= searchLimit; y += 1) {
       for (let x = -searchLimit; x <= searchLimit; x += 1) {
-        if (!this._isPositionTaken(x, y)) {
+        if (!this._isPositionTaken(x, y, ignoredCubeId)) {
           return { x, y };
         }
       }
     }
     return { x: searchLimit + 1, y: 0 };
+  }
+
+  _ensureAllCoordinates() {
+    this.cubes.forEach((cube) => {
+      if (Number.isFinite(cube.x) && Number.isFinite(cube.y)) {
+        return;
+      }
+      const position = this._findFirstFreeCoordinate(cube.id);
+      cube.x = position.x;
+      cube.y = position.y;
+    });
   }
 
   _isPositionTaken(x, y, ignoredCubeId) {
