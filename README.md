@@ -29,3 +29,4 @@ Puis ouvrez `http://localhost:3000` dans plusieurs onglets pour simuler plusieur
 - Connexion des cubes horizontalement/verticalement
 - Interactions entre personnages des cubes connectés (rencontre/discussion/visite)
 - Ville partagée en temps réel entre tous les joueurs connectés
+- Rendu de la ville en vraie scène 2D temps réel via PixiJS

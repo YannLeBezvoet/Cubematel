@@ -10,6 +10,7 @@ const io = new Server(server);
 const game = new CubeWorldGame();
 
 app.use(express.static(path.join(__dirname, "..", "public")));
+app.use("/vendor", express.static(path.join(__dirname, "..", "node_modules")));
 
 io.on("connection", (socket) => {
   const playerName = `Joueur-${socket.id.slice(0, 4)}`;
