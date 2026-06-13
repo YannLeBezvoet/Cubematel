@@ -183,7 +183,7 @@ function renderStickFigure(cube, palette) {
 function renderCubeIllustration(cube) {
   const palette = palettes[cube.character] || palettes.Dodger;
   const id = createIdFragment(cube.id);
-  const clipId = `frontFace-${id}`;
+  const clipId = `squareFace-${id}`;
   const gradientId = `glow-${id}`;
   const safeEmotion = escapeHtml(cube.emotion);
   const safeCharacter = escapeHtml(cube.character);
@@ -196,7 +196,7 @@ function renderCubeIllustration(cube) {
           <stop offset="100%" stop-color="${palette.scene}" stop-opacity="0" />
         </radialGradient>
         <clipPath id="${clipId}">
-          <polygon points="112 76 188 76 188 145 150 168 112 145" />
+          <rect x="95" y="48" width="110" height="110" rx="14" />
         </clipPath>
       </defs>
       <rect x="0" y="0" width="300" height="220" rx="18" fill="${palette.scene}" />
@@ -204,16 +204,15 @@ function renderCubeIllustration(cube) {
       <circle cx="45" cy="38" r="3" fill="rgba(255,255,255,0.8)" />
       <circle cx="256" cy="54" r="2.5" fill="rgba(255,255,255,0.7)" />
       <circle cx="240" cy="28" r="1.7" fill="rgba(255,255,255,0.45)" />
-      <ellipse cx="150" cy="182" rx="74" ry="18" fill="rgba(0,0,0,0.34)" />
+      <rect x="102" y="165" width="96" height="14" rx="7" fill="rgba(0,0,0,0.34)" />
       <g>
-        <polygon points="150 26 208 58 150 91 92 58" fill="${palette.top}" />
-        <polygon points="92 58 92 151 150 184 150 91" fill="${palette.left}" />
-        <polygon points="208 58 208 151 150 184 150 91" fill="${palette.right}" />
-        <polygon points="112 76 188 76 188 145 150 168 112 145" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.26)" stroke-width="2" />
+        <rect x="95" y="48" width="110" height="110" rx="14" fill="${palette.left}" stroke="rgba(255,255,255,0.3)" stroke-width="2" />
+        <rect x="95" y="48" width="110" height="30" rx="14" fill="${palette.top}" />
+        <rect x="95" y="78" width="110" height="80" fill="${palette.right}" fill-opacity="0.16" />
         <g clip-path="url(#${clipId})">
-          <rect x="112" y="76" width="76" height="92" fill="rgba(255,255,255,0.04)" />
-          <circle cx="150" cy="130" r="44" fill="${palette.glow}" fill-opacity="0.16" />
-          <g transform="translate(112 76)">
+          <rect x="95" y="48" width="110" height="110" fill="rgba(255,255,255,0.04)" />
+          <circle cx="150" cy="112" r="48" fill="${palette.glow}" fill-opacity="0.16" />
+          <g transform="translate(110 50)">
             ${renderStickFigure(cube, palette)}
             ${renderProp(cube, palette)}
           </g>
