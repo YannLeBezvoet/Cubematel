@@ -191,9 +191,9 @@ function syncCubes(sceneState, cubes, targetInput) {
 
 function layoutCubes(sceneState, cubes) {
   const width = sceneState.app.screen.width;
-  const columns = Math.max(2, Math.floor((width - 90) / 120));
-  const left = 60;
-  const top = 70;
+  const height = sceneState.app.screen.height;
+  const centerX = width / 2;
+  const centerY = height / 2;
   const gapX = 110;
   const gapY = 110;
 
@@ -202,10 +202,10 @@ function layoutCubes(sceneState, cubes) {
     if (!node) {
       return;
     }
-    const col = index % columns;
-    const row = Math.floor(index / columns);
-    node.targetX = left + col * gapX;
-    node.targetY = top + row * gapY;
+    const x = Number.isFinite(cube.x) ? cube.x : index;
+    const y = Number.isFinite(cube.y) ? cube.y : 0;
+    node.targetX = centerX + x * gapX;
+    node.targetY = centerY + y * gapY;
   });
 }
 

@@ -11,6 +11,7 @@ class CubeWorldGame {
     const character = CHARACTERS.includes(preferredCharacter)
       ? preferredCharacter
       : CHARACTERS[this.cubes.size % CHARACTERS.length];
+    const position = this._findFirstFreeCoordinate();
 
     const cube = {
       id,
@@ -20,6 +21,8 @@ class CubeWorldGame {
       emotion: "happy",
       activity: character === "Dodger" ? "jongle avec un ballon" : "saute à la corde",
       connectedTo: [],
+      x: position.x,
+      y: position.y,
     };
 
     this.cubes.set(id, cube);
@@ -94,6 +97,7 @@ class CubeWorldGame {
     const orientation = direction === "vertical" ? "verticalement" : "horizontalement";
     const key = [sourceId, targetId].sort().join("::");
     this.links.add(key);
+    this._placeConnectedCube(sourceId, targetId, direction);
     this._syncConnections();
 
     const source = this.cubes.get(sourceId);
@@ -126,6 +130,67 @@ class CubeWorldGame {
       cubeA.connectedTo.push(b);
       cubeB.connectedTo.push(a);
     });
+  }
+
+  _findFirstFreeCoordinate() {
+    const searchLimit = this.cubes.size + 2;
+    for (let y = -searchLimit; y <= searchLimit; y += 1) {
+      for (let x = -searchLimit; x <= searchLimit; x += 1) {
+        if (!this._isPositionTaken(x, y)) {
+          return { x, y };
+        }
+      }
+    }
+    return { x: searchLimit + 1, y: 0 };
+  }
+
+  _isPositionTaken(x, y, ignoredCubeId) {
+    return [...this.cubes.values()].some(
+      (cube) => cube.id !== ignoredCubeId && cube.x === x && cube.y === y
+    );
+  }
+
+  _placeConnectedCube(sourceId, targetId, direction) {
+    const source = this.cubes.get(sourceId);
+    const target = this.cubes.get(targetId);
+    if (!source || !target) {
+      return;
+    }
+
+    const axis = direction === "vertical" ? "vertical" : "horizontal";
+    const currentCandidates = this._connectionCandidates(source, axis, 1);
+    const targetAlreadyPlaced = currentCandidates.some(
+      (candidate) => candidate.x === target.x && candidate.y === target.y
+    );
+    if (targetAlreadyPlaced) {
+      return;
+    }
+
+    const maxDistance = Math.max(2, this.cubes.size + 1);
+    for (let distance = 1; distance <= maxDistance; distance += 1) {
+      const candidates = this._connectionCandidates(source, axis, distance);
+      const destination = candidates.find(
+        (candidate) => !this._isPositionTaken(candidate.x, candidate.y, target.id)
+      );
+      if (destination) {
+        target.x = destination.x;
+        target.y = destination.y;
+        return;
+      }
+    }
+  }
+
+  _connectionCandidates(source, axis, distance) {
+    if (axis === "vertical") {
+      return [
+        { x: source.x, y: source.y + distance },
+        { x: source.x, y: source.y - distance },
+      ];
+    }
+    return [
+      { x: source.x + distance, y: source.y },
+      { x: source.x - distance, y: source.y },
+    ];
   }
 
   _recordInteractions(sourceId, explicitTargetId) {
