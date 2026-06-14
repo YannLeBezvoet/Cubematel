@@ -26,7 +26,7 @@ Le serveur maintient l'état autoritaire (position, connexions, historique, émo
 ## 3. Installation et exécution
 
 ```bash
-nvm use
+nvm use 20.19.6
 npm install
 npm start
 ```
