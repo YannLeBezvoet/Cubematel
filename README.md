@@ -2,13 +2,6 @@
 
 Jeu temps réel Node.js inspiré de Cube World, avec serveur Socket.IO et rendu PixiJS.
 
-## Objectif du refactor
-
-- garder le code simple à lire et à modifier
-- limiter le nombre de responsabilités par fichier
-- documenter les flux principaux
-- conserver le comportement existant
-
 ## Lancement
 
 ```bash
