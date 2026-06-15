@@ -158,14 +158,11 @@ function setupPanInteractions(sceneState) {
 }
 
 function getPointerPosition(event) {
-  if (event.global) {
-    return { x: event.global.x, y: event.global.y };
+  if (event.clientX !== undefined) {
+    return { x: event.clientX, y: event.clientY };
   }
-
-  return {
-    x: event.clientX,
-    y: event.clientY,
-  };
+  // Fallback for PixiJS synthetic events without clientX
+  return { x: event.global.x, y: event.global.y };
 }
 
 function updatePanOverlay(sceneState) {
