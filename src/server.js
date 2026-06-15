@@ -2,7 +2,8 @@ const path = require("path");
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
-const { CubeWorldGame, CHARACTERS } = require("./game");
+const { CubeWorldGame } = require("./game");
+const { registerSocketHandlers } = require("./socket-handlers");
 
 const app = express();
 const server = http.createServer(app);
@@ -13,25 +14,7 @@ app.use(express.static(path.join(__dirname, "..", "public")));
 app.use("/vendor", express.static(path.join(__dirname, "..", "node_modules")));
 
 io.on("connection", (socket) => {
-  const playerName = `Joueur-${socket.id.slice(0, 4)}`;
-  const preferredCharacter = CHARACTERS[Math.floor(Math.random() * CHARACTERS.length)];
-  game.createCube(socket.id, playerName, preferredCharacter);
-  io.emit("world:update", game.getState());
-
-  socket.on("cube:move", ({ movement }) => {
-    game.moveCube(socket.id, movement);
-    io.emit("world:update", game.getState());
-  });
-
-  socket.on("cubes:connect", ({ targetId, direction }) => {
-    game.connectCubes(socket.id, targetId, direction);
-    io.emit("world:update", game.getState());
-  });
-
-  socket.on("disconnect", () => {
-    game.removeCube(socket.id);
-    io.emit("world:update", game.getState());
-  });
+  registerSocketHandlers(io, socket, game);
 });
 
 const PORT = process.env.PORT || 3000;

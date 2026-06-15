@@ -1,6 +1,7 @@
 import { createCubeNode, drawCube } from "./cube-node.js";
 import { renderHistory, updateCounters } from "./dom.js";
 
+// Synchronise l'état serveur avec les nodes Pixi déjà en mémoire.
 export function renderWorld(sceneState, state, refs) {
   sceneState.latestWorld = state;
   const cubes = state.cubes.slice().sort((a, b) => {
@@ -32,12 +33,14 @@ export function renderWorld(sceneState, state, refs) {
   });
 }
 
+// Déduplique les liens pour éviter de compter deux fois la même connexion.
 function collectUniqueLinks(cubes) {
   return new Set(
     cubes.flatMap((cube) => (cube.connectedTo || []).map((target) => [cube.id, target].sort().join("::")))
   );
 }
 
+// Crée ou supprime les nodes pour coller exactement aux cubes actifs.
 function syncCubes(sceneState, cubes, targetInput) {
   const existingIds = new Set(sceneState.cubeNodes.keys());
 
@@ -57,6 +60,7 @@ function syncCubes(sceneState, cubes, targetInput) {
   });
 }
 
+// Centre le monde visuel sur le cube local.
 function layoutCubes(sceneState, cubes) {
   const width = sceneState.app.screen.width;
   const height = sceneState.app.screen.height;

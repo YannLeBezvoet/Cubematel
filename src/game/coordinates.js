@@ -1,3 +1,4 @@
+// Rattrape les cubes sans coordonnées pour éviter les états partiels.
 function ensureAllCoordinates(cubes) {
   cubes.forEach((cube) => {
     if (Number.isFinite(cube.x) && Number.isFinite(cube.y)) {
@@ -9,6 +10,7 @@ function ensureAllCoordinates(cubes) {
   });
 }
 
+// Cherche la première case libre dans une grille simple et déterministe.
 function findFirstFreeCoordinate(cubes, ignoredCubeId) {
   const searchLimit = cubes.size + 2;
   for (let y = -searchLimit; y <= searchLimit; y += 1) {
@@ -21,12 +23,14 @@ function findFirstFreeCoordinate(cubes, ignoredCubeId) {
   return { x: searchLimit + 1, y: 0 };
 }
 
+// Vérifie si une position est déjà occupée par un autre cube.
 function isPositionTaken(cubes, x, y, ignoredCubeId) {
   return [...cubes.values()].some(
     (cube) => cube.id !== ignoredCubeId && cube.x === x && cube.y === y
   );
 }
 
+// Place le cube cible sur une case voisine libre dans l'axe demandé.
 function placeConnectedCube(cubes, sourceId, targetId, direction) {
   const source = cubes.get(sourceId);
   const target = cubes.get(targetId);
@@ -54,6 +58,7 @@ function placeConnectedCube(cubes, sourceId, targetId, direction) {
   return true;
 }
 
+// Produit les deux emplacements autorisés pour une connexion.
 function connectionCandidates(source, direction) {
   if (direction === "vertical") {
     return [

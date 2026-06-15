@@ -1,3 +1,4 @@
+// Traduit un mouvement de l'UI en réaction métier minimale.
 function getMovementAction(movement, cube) {
   const actions = {
     shake: {

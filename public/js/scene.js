@@ -31,9 +31,11 @@ export function createScene({
   };
 
   return {
+    // Mémorise l'identité locale pour prioriser son cube à l'écran.
     setMyCubeId(cubeId) {
       sceneState.myCubeId = cubeId;
     },
+    // Applique le snapshot serveur quand la scène est prête.
     handleWorldUpdate(state) {
       if (!state || !Array.isArray(state.cubes)) {
         return;
@@ -49,6 +51,7 @@ export function createScene({
         showSceneError(sceneState, cubeScene, "Erreur lors de la mise a jour de la scène.");
       }
     },
+    // Initialise Pixi et les calques visuels une seule fois.
     setup() {
       setupScene(sceneState, {
         cubeScene,

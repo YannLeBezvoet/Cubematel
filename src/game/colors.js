@@ -1,5 +1,6 @@
 const { CUBE_COLORS } = require("./constants");
 
+// Réutilise d'abord la palette connue avant de générer une couleur de secours.
 function pickRandomAvailableColor(cubes) {
   const usedColors = new Set([...cubes.values()].map((cube) => cube.color).filter(Number.isInteger));
   const availableColors = CUBE_COLORS.filter((color) => !usedColors.has(color));
