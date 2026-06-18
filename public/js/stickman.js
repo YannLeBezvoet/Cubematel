@@ -12,9 +12,13 @@
  * Coordinate system (grid units, Y+ downward):
  *   - 1 grid unit = P display pixels.
  *   - Grid origin is the figure's visual center (hip level).
- *   - Head top: row -8 (y = -24px), feet bottom: row +3 (y = +12px).
+ *   - Head top: row -8 (y = -24px), feet bottom: row +3 bottom edge (y = +12px).
  *   - Total figure: 11 grid-row span × P = 36 display px tall.
  *   - Total figure: 8 grid-col span × P = 24 display px wide (with arms).
+ *
+ * Gravity positioning (managed by cube-node.js, not this file):
+ *   - Normal (upright): figure.y = 18 → feet-bottom at body y=30 (LCD bottom edge y=32).
+ *   - Upside_down:      figure.y = -19, scale.y=-1 → feet at body y=-31 (LCD top edge y=-33).
  *
  * Layout overview (grid rows, each cell = P px):
  *
@@ -206,12 +210,14 @@ function drawArms(gfx, emotion, character) {
 const PP = 2;
 
 /**
- * Draws a pixel-art basketball for Dodger, centred near (0, 22) in body coords.
+ * Draws a pixel-art basketball for Dodger, centred near (0, 28) in prop-local coords.
+ * At this cy the ball bottom aligns with the LCD bottom edge (y=32 in body coords).
+ * When the prop container is flipped (upside_down), the ball mirrors to the LCD top.
  *
  * @param {PIXI.Graphics} gfx
  */
 function drawBall(gfx) {
-  const cx = 0, cy = 22;
+  const cx = 0, cy = 28;
   gfx.drawRect(cx - PP,      cy - 2 * PP, 2 * PP, PP);
   gfx.drawRect(cx - 2 * PP, cy - PP,     4 * PP, PP);
   gfx.drawRect(cx - 2 * PP, cy,          4 * PP, PP);
@@ -219,12 +225,14 @@ function drawBall(gfx) {
 }
 
 /**
- * Draws a pixel-art lasso coil for Whip, centred near (0, 20) in body coords.
+ * Draws a pixel-art lasso coil for Whip, centred near (0, 24) in prop-local coords.
+ * At this cy the rope bottom aligns with the LCD bottom edge (y=32 in body coords).
+ * When the prop container is flipped (upside_down), the rope mirrors to the LCD top.
  *
  * @param {PIXI.Graphics} gfx
  */
 function drawRope(gfx) {
-  const cx = 0, cy = 20;
+  const cx = 0, cy = 24;
   gfx.drawRect(cx - 3 * PP, cy,          6 * PP, PP);
   gfx.drawRect(cx - 4 * PP, cy + PP,     PP,     2 * PP);
   gfx.drawRect(cx + 3 * PP, cy + PP,     PP,     2 * PP);
