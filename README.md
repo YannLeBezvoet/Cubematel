@@ -52,6 +52,18 @@ public/js/
 | `public/js/scene-setup.js` | initialisation Pixi |
 | `public/js/scene-pan.js` | caméra et pan |
 | `public/js/scene-world.js` | rendu du snapshot serveur |
+| `public/js/cube-node.js` | fabrique et rendu d'un nœud cube (frame LCD + figure) |
+| `public/js/stickman.js` | dessin pixel art du stickman et des icônes de prop |
+
+## Rendu visuel
+
+Chaque cube est rendu comme un boîtier LCD inspiré du Cube World de Mattel :
+
+- **Cadre coloré** : bordure arrondie dans la couleur du personnage.
+- **Écran LCD** : fond gris foncé simulant un écran à cristaux liquides.
+- **Stickman pixel art** : personnage en blocs carrés noirs (4×4 px chacun).
+- **Poses** : les bras changent selon l'émotion (`surpris`, `joyeux`, `curieux`, défaut).
+- **Prop** : icône en bas de l'écran — ballon pour Dodger, lasso pour Whip.
 
 ## Tests
 
