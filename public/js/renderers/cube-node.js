@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * @file renderers/cube-node.js
  * @description PIXI.js node factory and renderer for a single cube in the scene.
@@ -12,8 +13,35 @@
  *   - mood       : character + emotion line below the label
  *
  * The `figure` layer is Y-flipped when the cube orientation is "upside_down".
+ * Position transitions are driven by GSAP via scene/world.js (not this module).
  *
  * @dependencies PIXI.js v7 (via window.PIXI), renderers/stickman.js
+ */
+
+/**
+ * @typedef {import('../../../types/cube.js').Cube} Cube
+ */
+
+/**
+ * @typedef {Object} CubeNode
+ * @property {string} id
+ * @property {any} container   - Root display object added to cubeLayer
+ * @property {any} body         - Rotated during flip animation
+ * @property {any} cubeShape
+ * @property {any} halo
+ * @property {any} figure
+ * @property {any} prop
+ * @property {any} plate
+ * @property {any} label
+ * @property {any} mood
+ * @property {number} x          - Current interpolated X (GSAP-managed)
+ * @property {number} y          - Current interpolated Y (GSAP-managed)
+ * @property {number} targetX    - Destination X set by layoutCubes
+ * @property {number} targetY    - Destination Y set by layoutCubes
+ * @property {number} phase      - Phase accumulator for bobbing sine wave
+ * @property {Cube | null} cube  - Last known server cube state
+ * @property {boolean} flipping  - True while a GSAP flip tween is running
+ * @property {Cube | null} _pendingCube - Cube state to apply after flip completes
  */
 
 import { drawStickman, drawProp } from "./stickman.js";
@@ -23,7 +51,7 @@ import { drawStickman, drawProp } from "./stickman.js";
  *
  * @param {string} id           - Unique cube identifier
  * @param {HTMLInputElement} targetInput - Input to fill when the node is tapped
- * @returns {Object} node - A plain object holding all PIXI display objects and state
+ * @returns {CubeNode}
  */
 export function createCubeNode(id, targetInput) {
   const PIXI = window.PIXI;
@@ -77,7 +105,8 @@ export function createCubeNode(id, targetInput) {
     targetY: 0,
     phase: Math.random() * Math.PI * 2,
     cube: null,
-    flipAnim: null,
+    flipping: false,
+    _pendingCube: null,
   };
 }
 
@@ -85,8 +114,8 @@ export function createCubeNode(id, targetInput) {
  * Redraws all visual layers of a cube node to reflect the given cube state.
  * Called on every world update and at the end of flip animations.
  *
- * @param {Object} node  - Cube node created by createCubeNode
- * @param {Object} cube  - Cube state: { color, orientation, emotion, character, playerName }
+ * @param {CubeNode} node
+ * @param {{ color: number, orientation: string, emotion: string, character: string, playerName: string }} cube
  */
 export function drawCube(node, cube) {
   const cubeColor = Number.isInteger(cube.color) ? cube.color : 0xcccccc;

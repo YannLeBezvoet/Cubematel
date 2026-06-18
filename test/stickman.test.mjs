@@ -10,8 +10,7 @@
  * Uses a lightweight PIXI.Graphics mock — no browser required.
  */
 
-import test from "node:test";
-import assert from "node:assert/strict";
+import { test, expect } from "vitest";
 import { drawStickman, drawProp } from "../public/js/renderers/stickman.js";
 
 // ─── PIXI.Graphics mock ───────────────────────────────────────────────────────
@@ -56,21 +55,21 @@ function bbox(rects) {
 // ─── drawStickman tests ───────────────────────────────────────────────────────
 
 test("drawStickman exports correctly", () => {
-  assert.equal(typeof drawStickman, "function");
-  assert.equal(typeof drawProp, "function");
+  expect(typeof drawStickman).toBe("function");
+  expect(typeof drawProp).toBe("function");
 });
 
 test("drawStickman default pose fits within 24×36 px bounding box", () => {
   const gfx = makeMockGfx();
   drawStickman(gfx, "happy", "Whip");
 
-  assert.ok(gfx.rects.length > 0, "should draw at least one rect");
+  expect(gfx.rects.length).toBeGreaterThan(0);
 
   const { minX, minY, maxX, maxY } = bbox(gfx.rects);
-  assert.ok(minX >= -12, `left edge ${minX} should be ≥ -12`);
-  assert.ok(maxX <= 12,  `right edge ${maxX} should be ≤ +12`);
-  assert.ok(minY >= -24, `top edge ${minY} should be ≥ -24`);
-  assert.ok(maxY <= 12,  `bottom edge ${maxY} should be ≤ +12`);
+  expect(minX).toBeGreaterThanOrEqual(-12);
+  expect(maxX).toBeLessThanOrEqual(12);
+  expect(minY).toBeGreaterThanOrEqual(-24);
+  expect(maxY).toBeLessThanOrEqual(12);
 });
 
 test("drawStickman arms-wide pose (surpris) stays within bounding box", () => {
@@ -78,47 +77,38 @@ test("drawStickman arms-wide pose (surpris) stays within bounding box", () => {
   drawStickman(gfx, "surpris", "Dodger");
 
   const { minX, maxX, minY, maxY } = bbox(gfx.rects);
-  assert.ok(minX >= -12, `left edge ${minX}`);
-  assert.ok(maxX <= 12,  `right edge ${maxX}`);
-  assert.ok(minY >= -24, `top edge ${minY}`);
-  assert.ok(maxY <= 12,  `bottom edge ${maxY}`);
+  expect(minX).toBeGreaterThanOrEqual(-12);
+  expect(maxX).toBeLessThanOrEqual(12);
+  expect(minY).toBeGreaterThanOrEqual(-24);
+  expect(maxY).toBeLessThanOrEqual(12);
 });
 
 test("drawStickman joyeux pose arm cells reach above row -4 (y=-12)", () => {
-  // joyeux/Whip raises the left arm to rows -5,-6 (y=-15,-18).
-  // happy/Whip hangs arms at rows -4,-3 (y=-12,-9).
-  // Head is always at rows -8..-6 for both, so we compare arm-region cells only
-  // (i.e. cells with x outside the torso cols -2..+1, which is x outside -6..+6).
   const gfxJoyeux = makeMockGfx();
   drawStickman(gfxJoyeux, "joyeux", "Whip");
 
   const gfxHappy = makeMockGfx();
   drawStickman(gfxHappy, "happy", "Whip");
 
-  // Arm cells: outside x range of torso (-6 to +6)
   const armCellsJoyeux = gfxJoyeux.rects.filter((r) => r.x < -6 || r.x >= 6);
   const armCellsHappy  = gfxHappy.rects.filter((r) => r.x < -6 || r.x >= 6);
 
   const topJoyeux = bbox(armCellsJoyeux).minY;
   const topHappy  = bbox(armCellsHappy).minY;
 
-  assert.ok(
-    topJoyeux < topHappy,
-    `joyeux arm top (y=${topJoyeux}) should be higher (more negative) than happy arm top (y=${topHappy})`
-  );
+  expect(topJoyeux).toBeLessThan(topHappy);
 });
 
 test("drawStickman head is symmetric around x=0", () => {
   const gfx = makeMockGfx();
   drawStickman(gfx, "happy", "Dodger");
 
-  // Head rows: -8 to -6, i.e. display y = -24 to -15
   const headRects = gfx.rects.filter((r) => r.y <= -15);
-  assert.ok(headRects.length > 0, "head cells must exist at top rows");
+  expect(headRects.length).toBeGreaterThan(0);
 
   const { minX, maxX } = bbox(headRects);
-  assert.equal(minX, -6, "head left edge at x=-6");
-  assert.equal(maxX,  6, "head right edge at x=+6");
+  expect(minX).toBe(-6);
+  expect(maxX).toBe(6);
 });
 
 test("all emotion poses draw same number of body cells (head+neck+torso+legs)", () => {
@@ -128,9 +118,8 @@ test("all emotion poses draw same number of body cells (head+neck+torso+legs)", 
     drawStickman(gfx, e, "Whip");
     return gfx.rects.length;
   });
-  // Only arm pose changes — body cell count must stay constant across emotions
   const unique = new Set(counts);
-  assert.equal(unique.size, 1, `all poses should draw the same total number of cells, got: ${counts}`);
+  expect(unique.size).toBe(1);
 });
 
 // ─── drawProp tests ───────────────────────────────────────────────────────────
@@ -138,11 +127,11 @@ test("all emotion poses draw same number of body cells (head+neck+torso+legs)", 
 test("drawProp Dodger draws a basketball (4 rects)", () => {
   const gfx = makeMockGfx();
   drawProp(gfx, "Dodger");
-  assert.equal(gfx.rects.length, 4, "basketball uses 4 drawRect calls");
+  expect(gfx.rects.length).toBe(4);
 });
 
 test("drawProp Whip draws a rope (5 rects)", () => {
   const gfx = makeMockGfx();
   drawProp(gfx, "Whip");
-  assert.equal(gfx.rects.length, 5, "rope uses 5 drawRect calls");
+  expect(gfx.rects.length).toBe(5);
 });

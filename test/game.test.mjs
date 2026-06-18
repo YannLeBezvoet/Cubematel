@@ -1,6 +1,12 @@
-const test = require("node:test");
-const assert = require("node:assert/strict");
-const { CubeWorldGame, CUBE_COLORS } = require("../src/game");
+/**
+ * @file test/game.test.mjs
+ * @description Unit tests for CubeWorldGame — server-side game logic.
+ *
+ * Covers: movements, connections, colour assignment, and face constraints.
+ */
+
+import { test, expect } from "vitest";
+import { CubeWorldGame, CUBE_COLORS } from "../src/game.js";
 
 test("un cube réagit aux mouvements", () => {
   const game = new CubeWorldGame();
@@ -8,11 +14,11 @@ test("un cube réagit aux mouvements", () => {
 
   game.moveCube("a", "shake");
   let cube = game.getState().cubes[0];
-  assert.equal(cube.emotion, "surpris");
+  expect(cube.emotion).toBe("surpris");
 
   game.moveCube("a", "flip");
   cube = game.getState().cubes[0];
-  assert.equal(cube.orientation, "upside_down");
+  expect(cube.orientation).toBe("upside_down");
 });
 
 test("deux cubes connectés peuvent interagir", () => {
@@ -25,10 +31,10 @@ test("deux cubes connectés peuvent interagir", () => {
   const cubeA = state.cubes.find((cube) => cube.id === "a");
   const cubeB = state.cubes.find((cube) => cube.id === "b");
 
-  assert.deepEqual(cubeA.connectedTo, ["b"]);
-  assert.equal(cubeB.y, cubeA.y);
-  assert.equal(Math.abs(cubeB.x - cubeA.x), 1);
-  assert.ok(state.history.some((entry) => entry.text.includes("discutent ensemble")));
+  expect(cubeA.connectedTo).toEqual(["b"]);
+  expect(cubeB.y).toBe(cubeA.y);
+  expect(Math.abs(cubeB.x - cubeA.x)).toBe(1);
+  expect(state.history.some((entry) => entry.text.includes("discutent ensemble"))).toBe(true);
 });
 
 test("chaque cube reçoit une couleur aléatoire différente", () => {
@@ -40,11 +46,11 @@ test("chaque cube reçoit une couleur aléatoire différente", () => {
   const cubeA = state.cubes.find((cube) => cube.id === "a");
   const cubeB = state.cubes.find((cube) => cube.id === "b");
 
-  assert.equal(typeof cubeA.color, "number");
-  assert.equal(typeof cubeB.color, "number");
-  assert.notEqual(cubeA.color, cubeB.color);
-  assert.ok(CUBE_COLORS.includes(cubeA.color));
-  assert.ok(CUBE_COLORS.includes(cubeB.color));
+  expect(typeof cubeA.color).toBe("number");
+  expect(typeof cubeB.color).toBe("number");
+  expect(cubeA.color).not.toBe(cubeB.color);
+  expect(CUBE_COLORS.includes(cubeA.color)).toBe(true);
+  expect(CUBE_COLORS.includes(cubeB.color)).toBe(true);
 });
 
 test("une connexion verticale place le cube au dessus ou en dessous", () => {
@@ -57,8 +63,8 @@ test("une connexion verticale place le cube au dessus ou en dessous", () => {
   const cubeA = state.cubes.find((cube) => cube.id === "a");
   const cubeB = state.cubes.find((cube) => cube.id === "b");
 
-  assert.equal(cubeB.x, cubeA.x);
-  assert.equal(Math.abs(cubeB.y - cubeA.y), 1);
+  expect(cubeB.x).toBe(cubeA.x);
+  expect(Math.abs(cubeB.y - cubeA.y)).toBe(1);
 });
 
 test("une connexion verticale réaligne aussi des cubes sans coordonnées", () => {
@@ -77,8 +83,8 @@ test("une connexion verticale réaligne aussi des cubes sans coordonnées", () =
   const alignedA = state.cubes.find((cube) => cube.id === "a");
   const alignedB = state.cubes.find((cube) => cube.id === "b");
 
-  assert.equal(alignedB.x, alignedA.x);
-  assert.equal(Math.abs(alignedB.y - alignedA.y), 1);
+  expect(alignedB.x).toBe(alignedA.x);
+  expect(Math.abs(alignedB.y - alignedA.y)).toBe(1);
 });
 
 test("chaque face d'un cube n'accepte qu'un seul voisin", () => {
@@ -96,7 +102,7 @@ test("chaque face d'un cube n'accepte qu'un seul voisin", () => {
   const cubeA = state.cubes.find((cube) => cube.id === "a");
   const cubeD = state.cubes.find((cube) => cube.id === "d");
 
-  assert.equal(cubeA.connectedTo.length, 2);
-  assert.ok(!cubeA.connectedTo.includes("d"));
-  assert.notEqual(Math.abs(cubeD.x - cubeA.x) + Math.abs(cubeD.y - cubeA.y), 1);
+  expect(cubeA.connectedTo.length).toBe(2);
+  expect(cubeA.connectedTo.includes("d")).toBe(false);
+  expect(Math.abs(cubeD.x - cubeA.x) + Math.abs(cubeD.y - cubeA.y)).not.toBe(1);
 });

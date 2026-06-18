@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * @file scene/world.js
  * @description Synchronises the server snapshot with the live PixiJS scene.
@@ -6,13 +7,49 @@
  * in the viewport relative to the local player's cube, and triggers redraws or
  * flip animations when orientation changes.
  *
- * @dependencies renderers/cube-node.js, dom.js
+ * Position transitions use GSAP tweens (gsap.to on node.x / node.y).
+ * Flip animations use a GSAP tween on node.body.rotation with ease "sine.inOut".
+ *
+ * @dependencies renderers/cube-node.js, dom.js, GSAP (window.gsap)
  */
 
 import { createCubeNode, drawCube } from "../renderers/cube-node.js";
 import { renderHistory, updateCounters } from "../dom.js";
 
-// Synchronise l'état serveur avec les nodes Pixi déjà en mémoire.
+/**
+ * @typedef {import('../renderers/cube-node.js').Cube} Cube
+ */
+
+/**
+ * @typedef {Object} SceneState
+ * @property {any} app
+ * @property {any} backgroundLayer
+ * @property {any} linksLayer
+ * @property {any} cubeLayer
+ * @property {any} linkGraphics
+ * @property {any} panOverlay
+ * @property {Map<string, import('../renderers/cube-node.js').CubeNode>} cubeNodes
+ * @property {string[][]} links
+ * @property {Array<{sprite: any, speed: number, drift: number}>} stars
+ * @property {Array<{sprite: any, velocityX: number, velocityY: number, phase: number}>} floaters
+ * @property {string | null} myCubeId
+ * @property {number} cameraX
+ * @property {number} cameraY
+ * @property {boolean} ready
+ * @property {object | null} latestWorld
+ * @property {object | null} dragState
+ * @property {ResizeObserver | null} resizeObserver
+ */
+
+/**
+ * Synchronises server state with the live Pixi scene.
+ * Creates/removes cube nodes, updates positions via GSAP, triggers flip
+ * animations and redraws on state change.
+ *
+ * @param {SceneState} sceneState
+ * @param {{ cubes: Cube[], history: object[] }} state
+ * @param {{ targetInput: HTMLInputElement, cubeCount: HTMLElement, linkCount: HTMLElement, historyList: HTMLElement }} refs
+ */
 export function renderWorld(sceneState, state, refs) {
   sceneState.latestWorld = state;
   const cubes = state.cubes.slice().sort((a, b) => {
@@ -36,18 +73,15 @@ export function renderWorld(sceneState, state, refs) {
 
   cubes.forEach((cube) => {
     const node = sceneState.cubeNodes.get(cube.id);
-    if (!node) {
-      return;
-    }
+    if (!node) return;
 
     const prevOrientation = node.cube?.orientation;
     const orientationChanged = prevOrientation !== undefined && prevOrientation !== cube.orientation;
 
-    if (orientationChanged && !node.flipAnim) {
-      node.flipAnim = { progress: 0, pendingCube: cube };
-      drawCube(node, { ...cube, orientation: prevOrientation });
-    } else if (node.flipAnim) {
-      node.flipAnim.pendingCube = cube;
+    if (orientationChanged && !node.flipping) {
+      startFlipAnimation(node, cube);
+    } else if (node.flipping) {
+      node._pendingCube = cube;
     } else {
       drawCube(node, cube);
     }
@@ -56,14 +90,54 @@ export function renderWorld(sceneState, state, refs) {
   });
 }
 
-// Déduplique les liens pour éviter de compter deux fois la même connexion.
+/**
+ * Triggers a GSAP flip animation on node.body.rotation (0 → π → 0).
+ * Redraws the cube with pending state at the end.
+ *
+ * @param {import('../renderers/cube-node.js').CubeNode} node
+ * @param {Cube} cube - The incoming cube state to apply after the flip
+ */
+function startFlipAnimation(node, cube) {
+  node.flipping = true;
+  node._pendingCube = cube;
+  if (node.cube) {
+    drawCube(node, node.cube);
+  }
+
+  window.gsap.to(node.body, {
+    rotation: Math.PI,
+    duration: 1.5,
+    ease: "sine.inOut",
+    onComplete: () => {
+      if (node._pendingCube) {
+        drawCube(node, node._pendingCube);
+      }
+      node.body.rotation = 0;
+      node.flipping = false;
+      node._pendingCube = null;
+    },
+  });
+}
+
+/**
+ * Deduplicates links to avoid counting the same connection twice.
+ *
+ * @param {Cube[]} cubes
+ * @returns {Set<string>}
+ */
 function collectUniqueLinks(cubes) {
   return new Set(
     cubes.flatMap((cube) => (cube.connectedTo || []).map((target) => [cube.id, target].sort().join("::")))
   );
 }
 
-// Crée ou supprime les nodes pour coller exactement aux cubes actifs.
+/**
+ * Creates missing cube nodes and removes nodes for cubes no longer in the state.
+ *
+ * @param {SceneState} sceneState
+ * @param {Cube[]} cubes
+ * @param {HTMLInputElement} targetInput
+ */
 function syncCubes(sceneState, cubes, targetInput) {
   const existingIds = new Set(sceneState.cubeNodes.keys());
 
@@ -78,12 +152,19 @@ function syncCubes(sceneState, cubes, targetInput) {
 
   existingIds.forEach((id) => {
     const node = sceneState.cubeNodes.get(id);
+    if (!node) return;
     sceneState.cubeLayer.removeChild(node.container);
     sceneState.cubeNodes.delete(id);
   });
 }
 
-// Centre le monde visuel sur le cube local.
+/**
+ * Computes each cube's target screen position relative to the local player's
+ * cube and triggers a GSAP tween on node.x / node.y.
+ *
+ * @param {SceneState} sceneState
+ * @param {Cube[]} cubes
+ */
 function layoutCubes(sceneState, cubes) {
   const width = sceneState.app.screen.width;
   const height = sceneState.app.screen.height;
@@ -92,17 +173,24 @@ function layoutCubes(sceneState, cubes) {
   const gapX = 80;
   const gapY = 80;
   const myCube = cubes.find((cube) => cube.id === sceneState.myCubeId);
-  const originX = Number.isFinite(myCube?.x) ? myCube.x : 0;
-  const originY = Number.isFinite(myCube?.y) ? myCube.y : 0;
+  const originX = Number.isFinite(myCube?.x) ? myCube?.x ?? 0 : 0;
+  const originY = Number.isFinite(myCube?.y) ? myCube?.y ?? 0 : 0;
 
   cubes.forEach((cube, index) => {
     const node = sceneState.cubeNodes.get(cube.id);
-    if (!node) {
-      return;
-    }
+    if (!node) return;
+
     const x = Number.isFinite(cube.x) ? cube.x : index;
     const y = Number.isFinite(cube.y) ? cube.y : 0;
     node.targetX = centerX + (x - originX) * gapX;
     node.targetY = centerY + (y - originY) * gapY;
+
+    window.gsap.to(node, {
+      x: node.targetX,
+      y: node.targetY,
+      duration: 0.35,
+      ease: "power2.out",
+      overwrite: "auto",
+    });
   });
 }

@@ -1,3 +1,4 @@
+// @ts-check
 const { CHARACTERS, CUBE_COLORS } = require("./constants");
 const { getMovementAction } = require("./movements");
 const { pickRandomAvailableColor } = require("./colors");
@@ -7,13 +8,28 @@ const {
   placeConnectedCube,
 } = require("./coordinates");
 
+/**
+ * @typedef {import('../../types/cube.js').Cube} Cube
+ * @typedef {import('../../types/cube.js').HistoryEntry} HistoryEntry
+ * @typedef {import('../../types/cube.js').GameState} GameState
+ */
+
 class CubeWorldGame {
   constructor() {
+    /** @type {Map<string, Cube>} */
     this.cubes = new Map();
+    /** @type {HistoryEntry[]} */
     this.history = [];
   }
 
-  // Crée un cube public avec un état initial cohérent.
+  /**
+   * Creates a cube with a coherent initial state and adds it to the world.
+   *
+   * @param {string} id
+   * @param {string} playerName
+   * @param {string} preferredCharacter
+   * @returns {Cube}
+   */
   createCube(id, playerName, preferredCharacter) {
     const character = CHARACTERS.includes(preferredCharacter)
       ? preferredCharacter
@@ -40,7 +56,11 @@ class CubeWorldGame {
     return cube;
   }
 
-  // Supprime proprement un cube et recalcule les liens restants.
+  /**
+   * Removes a cube and recomputes all remaining connections.
+   *
+   * @param {string} id
+   */
   removeCube(id) {
     const cube = this.cubes.get(id);
     if (!cube) {
@@ -52,7 +72,12 @@ class CubeWorldGame {
     this._syncConnections();
   }
 
-  // Applique un mouvement de jeu si l'action est reconnue.
+  /**
+   * Applies a player movement to a cube if the action is recognised.
+   *
+   * @param {string} id
+   * @param {string} movement - "shake" | "flip" | "tilt" | "play"
+   */
   moveCube(id, movement) {
     const cube = this.cubes.get(id);
     if (!cube) {
@@ -74,7 +99,13 @@ class CubeWorldGame {
     this._recordInteractions(id);
   }
 
-  // Force une connexion entre deux cubes si l'emplacement demandé existe.
+  /**
+   * Forces a connection between two cubes if a valid slot is available.
+   *
+   * @param {string} sourceId
+   * @param {string} targetId
+   * @param {"horizontal" | "vertical"} direction
+   */
   connectCubes(sourceId, targetId, direction) {
     if (sourceId === targetId || !this.cubes.has(sourceId) || !this.cubes.has(targetId)) {
       return;
@@ -100,7 +131,11 @@ class CubeWorldGame {
     this._recordInteractions(sourceId, targetId);
   }
 
-  // Expose uniquement l'état public consommé par le client.
+  /**
+   * Returns the public game state snapshot consumed by the client.
+   *
+   * @returns {GameState}
+   */
   getState() {
     ensureAllCoordinates(this.cubes);
     return {
@@ -140,7 +175,12 @@ class CubeWorldGame {
     });
   }
 
-  // Journalise les interactions avec un cube ciblé ou ses voisins.
+  /**
+   * Records interactions between a source cube and its target or neighbours.
+   *
+   * @param {string} sourceId
+   * @param {string} [explicitTargetId]
+   */
   _recordInteractions(sourceId, explicitTargetId) {
     const source = this.cubes.get(sourceId);
     if (!source) {
@@ -152,13 +192,17 @@ class CubeWorldGame {
       : source.connectedTo.map((id) => this.cubes.get(id));
 
     targets
-      .filter(Boolean)
+      .filter(/** @param {Cube | undefined} t @returns {t is Cube} */ (t) => t !== undefined)
       .forEach((target) => {
         this._record(`${source.character} passe voir ${target.character} dans le cube voisin.`);
       });
   }
 
-  // Ajoute une entrée horodatée dans l'historique.
+  /**
+   * Appends a timestamped entry to the history log.
+   *
+   * @param {string} text
+   */
   _record(text) {
     this.history.push({ text, timestamp: Date.now() });
   }

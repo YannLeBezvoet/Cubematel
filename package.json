@@ -5,7 +5,9 @@
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
-    "test": "node --test"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p public/tsconfig.json"
   },
   "repository": {
     "type": "git",
@@ -24,10 +26,15 @@
   "homepage": "https://github.com/YannLeBezvoet/Cubematel#readme",
   "dependencies": {
     "express": "^5.2.1",
+    "gsap": "^3.15.0",
     "pixi.js": "^7.4.2",
     "socket.io": "^4.8.3"
   },
   "overrides": {
     "ws": "^8.21.0"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
   }
 }
