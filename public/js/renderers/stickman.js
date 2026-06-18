@@ -53,16 +53,13 @@ function cell(gfx, col, row) {
 
 /**
  * Draws the head as a 4×3 solid block at rows -8 to -6, cols -2 to +1.
- * Accepts dx/dy offsets for bobbing or reaction animations.
  *
  * @param {PIXI.Graphics} gfx
- * @param {number} [dx=0] - Horizontal offset in grid units
- * @param {number} [dy=0] - Vertical offset in grid units
  */
-function drawHead(gfx, dx = 0, dy = 0) {
+function drawHead(gfx) {
   for (let r = -8; r <= -6; r++) {
     for (let c = -2; c <= 1; c++) {
-      cell(gfx, c + dx, r + dy);
+      cell(gfx, c, r);
     }
   }
 }
@@ -146,16 +143,6 @@ function drawArmsDown(gfx) {
 function drawArmsWide(gfx) {
   drawArm(gfx, -3, -4, -4, -4);
   drawArm(gfx,  2, -4,  3, -4);
-}
-
-/**
- * Both arms raised high (joyful / celebrating).
- *
- * @param {PIXI.Graphics} gfx
- */
-function drawArmsUp(gfx) {
-  drawArm(gfx, -3, -5, -4, -6);
-  drawArm(gfx,  2, -5,  3, -6);
 }
 
 /**

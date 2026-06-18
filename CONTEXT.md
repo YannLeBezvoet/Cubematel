@@ -15,14 +15,16 @@ Le serveur est la seule source de vérité — le client ne mute jamais l'état 
 
 **Stack :**
 - Serveur : Node.js ≥ 18, Express v5, Socket.IO v4 (CommonJS)
-- Client : PixiJS v7 (chargé via CDN/vendor), ES modules natifs, Socket.IO client
-- Tests : `node --test` (runner natif Node.js)
-- Pas de bundler, pas de TypeScript, pas de framework front
+- Client : PixiJS v7 (via `/vendor`), GSAP v3 (via `/vendor`), ES modules natifs, Socket.IO client
+- Tests : Vitest (`npm test` = `vitest run`, `npm run test:watch` = `vitest`)
+- Typage : TypeScript en mode `checkJs + noEmit` — pas de compilation, vérification par `npm run typecheck`
+- Pas de bundler, pas de framework front
 
 **Démarrage :**
 ```bash
-npm install && npm start   # http://localhost:3000
-npm test                   # tests unitaires
+npm install && npm start        # http://localhost:3000
+npm test                        # tests unitaires (Vitest)
+npm run typecheck               # vérification TypeScript (noEmit)
 ```
 
 ---
@@ -30,34 +32,42 @@ npm test                   # tests unitaires
 ## Architecture
 
 ```
+types/
+└── cube.d.ts              # Source de vérité partagée : interfaces Cube, HistoryEntry, GameState
+
 src/
 ├── server.js              # Bootstrap Express + Socket.IO ; exporte { app, server, game }
 ├── socket-handlers.js     # Branche les événements Socket.IO ; appelle game.* puis broadcastWorld
 └── game/
     ├── index.js           # Ré-export de CubeWorldGame, CHARACTERS, CUBE_COLORS
-    ├── cube-world-game.js # Classe CubeWorldGame — état du monde (Map<id, cube>)
+    ├── cube-world-game.js # Classe CubeWorldGame — état du monde (Map<id, cube>) ; @ts-check
     ├── constants.js       # CHARACTERS = ['Dodger','Whip'] ; CUBE_COLORS (12 couleurs hex)
     ├── coordinates.js     # Placement et connexion des cubes sur la grille
     ├── movements.js       # Traduit un mouvement UI → { emotion, activity, orientation? }
     └── colors.js          # Sélection aléatoire d'une couleur disponible
 
 public/
-├── index.html             # Point d'entrée HTML ; charge PIXI via /vendor et app.js
+├── index.html             # Point d'entrée HTML ; charge PIXI + GSAP via /vendor, puis app.js
 ├── app.js                 # Point d'entrée client : crée socket, scène, bind contrôles
 ├── styles.css
+├── tsconfig.json          # Config TS client (ESNext + DOM, checkJs:false, noEmit)
 └── js/
+    ├── globals.d.ts       # Étend Window : window.PIXI (PixiJS) et window.gsap (GSAP)
     ├── dom.js             # getDomRefs, bindControls, setSelfBadge, historique DOM
     ├── scene/
     │   ├── index.js       # createScene() — factory ; expose setMyCubeId / handleWorldUpdate / setup
-    │   ├── setup.js       # Initialisation PixiJS, calques, ResizeObserver, fond, animation
-    │   ├── world.js       # renderWorld() — diff cubeNodes, dessin des liens, historique
-    │   ├── animation.js   # Boucle ticker (bobbing, lerp position, flip animé)
+    │   ├── setup.js       # Initialisation PixiJS, calques, ResizeObserver, fond, ticker
+    │   ├── world.js       # renderWorld() — diff cubeNodes, tweens GSAP position/flip, historique ; @ts-check
+    │   ├── animation.js   # Boucle ticker : bobbing sinusoïdal uniquement (lerp et flip délégués à GSAP)
     │   ├── pan.js         # Caméra drag et déplacement des calques
     │   ├── background.js  # Étoiles + particules flottantes (décor)
     │   └── errors.js      # showSceneError() — message d'erreur fatal dans la scène
     └── renderers/
-        ├── cube-node.js   # createCubeNode / drawCube — conteneur PIXI d'un cube
+        ├── cube-node.js   # createCubeNode / drawCube — conteneur PIXI d'un cube ; @ts-check
         └── stickman.js    # drawStickman / drawProp — pixel art (grille P=3px)
+
+tsconfig.json              # Config TS serveur (CommonJS, checkJs:false, noEmit)
+vitest.config.mjs          # Configuration Vitest (environment: node)
 ```
 
 ---
@@ -116,7 +126,10 @@ Chaque cube est un `PIXI.Container` avec les couches (de bas en haut) :
 - `upside_down` : `figure.scale.y = -1`, `figure.y = -19` (gravité inversée).
 - Props : ballon (Dodger) ou lasso (Whip), toujours en bas de l'écran LCD.
 
-**Animations :** bobbing sinusoïdal par frame (phase aléatoire par cube), lerp position sur changement de coordonnées, animation flip (rotation Y temporaire via `flipAnim`).
+**Animations :**
+- **Bobbing** : sinusoïdal par frame dans le ticker Pixi (`animation.js`), intensité selon l'émotion.
+- **Transition de position** : `gsap.to(node, { x, y, duration: 0.35, ease: 'power2.out' })` déclenché depuis `world.js/layoutCubes` à chaque `world:update`.
+- **Flip d'orientation** : `gsap.to(node.body, { rotation: Math.PI, ease: 'sine.inOut' })` depuis `world.js/startFlipAnimation` ; `drawCube` rappelé dans `onComplete`. L'état en cours est tracé via `node.flipping` (booléen) et `node._pendingCube`.
 
 ---
 
@@ -126,13 +139,17 @@ Chaque cube est un `PIXI.Container` avec les couches (de bas en haut) :
 - `src/game.js` est un shim de compatibilité qui ré-exporte `src/game/index.js`.
 - Les modules client utilisent **ES modules natifs** (`import/export`) ; les modules serveur utilisent **CommonJS** (`require/module.exports`).
 - `public/js/package.json` déclare `"type": "module"` pour activer les ES modules dans le dossier client.
-- PIXI est accessible via `window.PIXI` (chargé depuis `/vendor/pixi.js/dist/browser/pixi.min.js`).
+- `window.PIXI` et `window.gsap` sont chargés via `<script src="/vendor/...">` et déclarés dans `public/js/globals.d.ts`.
+- Le type `Cube` (et `HistoryEntry`, `GameState`) est défini **une seule fois** dans `types/cube.d.ts` et importé via JSDoc `@typedef {import('...')}` côté serveur et client.
+- **TypeScript** : `// @ts-check` activé par fichier sur les modules complexes (`cube-world-game.js`, `cube-node.js`, `world.js`). Pas de compilation — `npm run typecheck` (tsc noEmit) pour vérifier.
 
 ---
 
 ## Tests existants
 
-| Fichier                    | Ce qu'il couvre                                         |
-|----------------------------|---------------------------------------------------------|
-| `test/game.test.js`        | Connexions, mouvements, couleurs, historique (CommonJS) |
-| `test/stickman.test.mjs`   | Rendu stickman : coordonnées des pixels (ES module)     |
+Runner : **Vitest** (`npm test` = `vitest run`, `npm run test:watch` = `vitest`).
+
+| Fichier                    | Ce qu'il couvre                                                  |
+|----------------------------|------------------------------------------------------------------|
+| `test/game.test.mjs`       | Connexions, mouvements, couleurs, historique (format Vitest ESM) |
+| `test/stickman.test.mjs`   | Rendu stickman : coordonnées des pixels (format Vitest ESM)      |

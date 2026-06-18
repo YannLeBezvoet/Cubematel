@@ -1,5 +1,5 @@
 // @ts-check
-const { CHARACTERS, CUBE_COLORS } = require("./constants");
+const { CHARACTERS } = require("./constants");
 const { getMovementAction } = require("./movements");
 const { pickRandomAvailableColor } = require("./colors");
 const {
@@ -208,4 +208,4 @@ class CubeWorldGame {
   }
 }
 
-module.exports = { CubeWorldGame, CHARACTERS, CUBE_COLORS };
+module.exports = { CubeWorldGame };
