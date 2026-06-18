@@ -91,6 +91,7 @@ All public interfaces must be documented clearly and completely.
 After every change:
 
 * Update README.md if behavior, setup, or usage changes.
+* **Update CONTEXT.md** if any of the following changes: module added/removed/renamed, Socket.IO events, cube data model, business rules, visual rendering logic, stack or conventions. CONTEXT.md is the primary orientation file read at the start of every session — keep it accurate.
 * Update architecture or design documents if structure changes.
 * Update API documentation if interfaces change.
 * Update examples if needed.
@@ -183,6 +184,7 @@ A task is NOT complete unless ALL conditions are met:
 * [ ] All tests pass
 * [ ] README updated if required
 * [ ] Architecture documentation updated if required
+* [ ] CONTEXT.md updated if modules, events, data model, business rules or conventions changed
 
 ---
 
