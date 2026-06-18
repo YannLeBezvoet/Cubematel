@@ -111,15 +111,19 @@ export function drawCube(node, cube) {
   node.cubeShape.endFill();
 
   // ── Stickman figure ────────────────────────────────────────────────────────
+  // Gravity: feet touch the LCD bottom (y=30) when upright, LCD top (y=-31) when upside_down.
+  // figure.y=18 → feet-bottom = 18 + 4×P = 30; figure.y=-19 → feet displayed at -19-12 = -31.
   const upsideDown = cube.orientation === "upside_down";
   node.figure.scale.y = upsideDown ? -1 : 1;
-  node.figure.position.set(0, upsideDown ? 10 : -10);
+  node.figure.position.set(0, upsideDown ? -19 : 18);
 
   node.figure.clear();
   drawStickman(node.figure, cube.emotion, cube.character);
 
   // ── Character prop icon ────────────────────────────────────────────────────
+  // Flip the prop with the figure so it stays on the same side as the stickman's feet.
   node.prop.clear();
+  node.prop.scale.y = upsideDown ? -1 : 1;
   drawProp(node.prop, cube.character);
 
   // ── Plate (drop-shadow) and halo (colour glow) ────────────────────────────
