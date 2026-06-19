@@ -13,11 +13,11 @@
  * @dependencies renderers/cube-node.js, dom.js, GSAP (window.gsap)
  */
 
-import { createCubeNode, drawCube } from "../renderers/cube-node.js";
+import { CubeNode } from "../renderers/cube-node.js";
 import { renderHistory, updateCounters, updateDirectionButtons } from "../dom.js";
 
 /**
- * @typedef {import('../renderers/cube-node.js').Cube} Cube
+ * @typedef {import('../../../types/cube.js').Cube} Cube
  * @typedef {import('../../../types/cube.js').HistoryEntry} HistoryEntry
  * @typedef {import('../../../types/cube.js').GameState} GameState
  */
@@ -41,7 +41,7 @@ import { renderHistory, updateCounters, updateDirectionButtons } from "../dom.js
  * @property {any} cubeLayer
  * @property {any} linkGraphics
  * @property {any} panOverlay
- * @property {Map<string, import('../renderers/cube-node.js').CubeNode>} cubeNodes
+ * @property {Map<string, import('../renderers/cube-node.js').CubeNode>} cubeNodes - The CubeNode class instances keyed by cube id
  * @property {string[][]} links
  * @property {Array<{sprite: any, speed: number, drift: number}>} stars
  * @property {Array<{sprite: any, velocityX: number, velocityY: number, phase: number}>} floaters
@@ -99,7 +99,7 @@ export function renderWorld(sceneState, state, refs) {
     } else if (node.flipping) {
       node._pendingCube = cube;
     } else {
-      drawCube(node, cube);
+      node.draw(cube);
     }
 
     node.cube = cube;
@@ -117,7 +117,7 @@ function startFlipAnimation(node, cube) {
   node.flipping = true;
   node._pendingCube = cube;
   if (node.cube) {
-    drawCube(node, node.cube);
+    node.draw(node.cube);
   }
 
   window.gsap.to(node.body, {
@@ -126,7 +126,7 @@ function startFlipAnimation(node, cube) {
     ease: "sine.inOut",
     onComplete: () => {
       if (node._pendingCube) {
-        drawCube(node, node._pendingCube);
+        node.draw(node._pendingCube);
       }
       node.body.rotation = 0;
       node.flipping = false;
@@ -165,7 +165,7 @@ function syncCubes(sceneState, cubes, refs) {
         refs.targetInput.focus();
         updateDirectionButtons(refs.directionButtons, sceneState.latestWorld?.cubes ?? [], id);
       };
-      const node = createCubeNode(cube.id, onSelect);
+      const node = new CubeNode(cube.id, onSelect);
       sceneState.cubeNodes.set(cube.id, node);
       sceneState.cubeLayer.addChild(node.container);
     }
