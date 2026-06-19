@@ -18,7 +18,7 @@ export interface Cube {
   character: string;
   /** "upright" | "upside_down" */
   orientation: string;
-  /** "happy" | "surpris" | "curieux" | "joyeux" | "désorienté" */
+  /** "happy" | "surprised" | "curious" | "joyful" | "disoriented" */
   emotion: string;
   activity: string;
   /** IDs of adjacent cubes */

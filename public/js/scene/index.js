@@ -56,11 +56,11 @@ export function createScene({
   };
 
   return {
-    // Mémorise l'identité locale pour prioriser son cube à l'écran.
+    // Stores the local identity to prioritise the player's cube on screen.
     setMyCubeId(cubeId) {
       sceneState.myCubeId = cubeId;
     },
-    // Applique le snapshot serveur quand la scène est prête.
+    // Applies the server snapshot when the scene is ready.
     handleWorldUpdate(state) {
       if (!state || !Array.isArray(state.cubes)) {
         return;
@@ -72,11 +72,11 @@ export function createScene({
       try {
         renderWorld(sceneState, state, { targetInput, directionButtons, cubeCount, linkCount, historyList });
       } catch (error) {
-        console.error("Erreur lors de world:update", error);
-        showSceneError(sceneState, cubeScene, "Erreur lors de la mise a jour de la scène.");
+        console.error("Error during world:update", error);
+        showSceneError(sceneState, cubeScene, "Error updating the scene.");
       }
     },
-    // Initialise Pixi et les calques visuels une seule fois.
+    // Initialises Pixi and visual layers once.
     setup() {
       setupScene(sceneState, {
         cubeScene,

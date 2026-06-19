@@ -1,8 +1,8 @@
 // @ts-check
 /**
  * @file src/game.js
- * @description Alias de compatibilité — ré-exporte src/game/index.
- * Permet d'écrire require('./game') depuis src/ comme depuis la racine.
+ * @description Compatibility shim — re-exports src/game/index.
+ * Allows require('./game') from src/ and from the project root.
  */
 
 module.exports = require("./game/index");

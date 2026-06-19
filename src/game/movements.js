@@ -1,13 +1,13 @@
 // @ts-check
 /**
  * @file src/game/movements.js
- * @description Traduction d'un mouvement UI en réaction métier.
+ * @description Translates a UI movement into a business reaction.
  *
- * Responsabilités :
- *   - Mapper les identifiants de mouvement ("shake", "flip", "tilt", "play")
- *     vers les champs métier (emotion, activity, orientation).
+ * Responsibilities:
+ *   - Map movement identifiers ("shake", "flip", "tilt", "play")
+ *     to business fields (emotion, activity, orientation).
  *
- * @dependencies Aucune (module autonome)
+ * @dependencies None (standalone module)
  */
 
 /**
@@ -19,32 +19,32 @@
  */
 
 /**
- * Traduit un mouvement UI en réaction métier minimale.
+ * Translates a UI movement into a minimal business reaction.
  *
  * @param {string} movement - "shake" | "flip" | "tilt" | "play"
- * @param {Cube} cube - État courant du cube effectuant le mouvement
- * @returns {MovementAction | null} Action à appliquer, ou null si mouvement inconnu
+ * @param {Cube} cube - Current state of the cube performing the movement
+ * @returns {MovementAction | null} Action to apply, or null if the movement is unknown
  */
 function getMovementAction(movement, cube) {
   /** @type {Record<string, MovementAction>} */
   const actions = {
     shake: {
-      emotion: "surpris",
-      activity: "rit en étant secoué",
+      emotion: "surprised",
+      activity: "laughs while being shaken",
     },
     flip: {
-      emotion: "désorienté",
-      activity: "pleure puis retrouve son équilibre",
+      emotion: "disoriented",
+      activity: "cries then regains balance",
       orientation: cube.orientation === "upright" ? "upside_down" : "upright",
     },
     tilt: {
-      emotion: "curieux",
-      activity: "regarde autour de lui",
+      emotion: "curious",
+      activity: "looks around",
     },
     play: {
-      emotion: "joyeux",
+      emotion: "joyful",
       activity:
-        cube.character === "Dodger" ? "dribble et tire" : "fait du lasso avec sa corde",
+        cube.character === "Dodger" ? "dribbles and shoots" : "twirls the lasso",
     },
   };
 

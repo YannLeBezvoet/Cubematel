@@ -44,14 +44,14 @@ class CubeWorldGame {
       character,
       orientation: "upright",
       emotion: "happy",
-      activity: character === "Dodger" ? "jongle avec un ballon" : "saute à la corde",
+      activity: character === "Dodger" ? "juggles a ball" : "jumps rope",
       connectedTo: [],
       x: position.x,
       y: position.y,
     };
 
     this.cubes.set(id, cube);
-    this._record(`${cube.character} (${cube.playerName}) rejoint la ville.`);
+    this._record(`${cube.character} (${cube.playerName}) joins the town.`);
     this._syncConnections();
     return cube;
   }
@@ -68,7 +68,7 @@ class CubeWorldGame {
     }
 
     this.cubes.delete(id);
-    this._record(`${cube.character} (${cube.playerName}) quitte la ville.`);
+    this._record(`${cube.character} (${cube.playerName}) leaves the town.`);
     this._syncConnections();
   }
 
@@ -100,12 +100,12 @@ class CubeWorldGame {
   }
 
   /**
-   * Déplace le cube source (joueur) pour le coller sur une face du cube cible.
-   * La face doit être libre ; si elle est occupée, la connexion est refusée.
+   * Moves the source cube (player) to snap it onto a face of the target cube.
+   * The face must be free; if it is occupied, the connection is rejected.
    *
    * @param {string} sourceId
    * @param {string} targetId
-   * @param {"above" | "below" | "left" | "right"} direction - Face du cube cible visée
+   * @param {"above" | "below" | "left" | "right"} direction - Target cube face to connect to
    */
   connectCubes(sourceId, targetId, direction) {
     if (sourceId === targetId || !this.cubes.has(sourceId) || !this.cubes.has(targetId)) {
@@ -125,9 +125,9 @@ class CubeWorldGame {
       return;
     }
 
-    const directionFr = { above: "au-dessus", below: "en dessous", left: "à gauche", right: "à droite" }[direction] ?? direction;
+    const directionLabel = { above: "above", below: "below", left: "to the left of", right: "to the right of" }[direction] ?? direction;
     this._record(
-      `${source.character} va se coller ${directionFr} du cube de ${target.character} et discutent ensemble.`
+      `${source.character} snaps ${directionLabel} ${target.character}'s cube and they chat together.`
     );
     this._recordInteractions(sourceId, targetId);
   }
@@ -145,7 +145,7 @@ class CubeWorldGame {
     };
   }
 
-  // Reconstruit les connexions à partir des coordonnées.
+  // Rebuilds connections from coordinates.
   _syncConnections() {
     ensureAllCoordinates(this.cubes);
     this.cubes.forEach((cube) => {
@@ -195,7 +195,7 @@ class CubeWorldGame {
     targets
       .filter(/** @param {Cube | undefined} t @returns {t is Cube} */ (t) => t !== undefined)
       .forEach((target) => {
-        this._record(`${source.character} passe voir ${target.character} dans le cube voisin.`);
+        this._record(`${source.character} visits ${target.character} in the neighbouring cube.`);
       });
   }
 

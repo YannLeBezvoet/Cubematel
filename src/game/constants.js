@@ -1,10 +1,10 @@
 // @ts-check
 /**
  * @file src/game/constants.js
- * @description Constantes partagées du jeu Cubematel.
+ * @description Shared game constants for Cubematel.
  *
- * CHARACTERS : personnages disponibles pour les cubes.
- * CUBE_COLORS : palette de couleurs 0xRRGGBB assignées aux cubes.
+ * CHARACTERS: available characters for cubes.
+ * CUBE_COLORS: 0xRRGGBB colour palette assigned to cubes.
  */
 
 /** @type {string[]} */

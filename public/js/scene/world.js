@@ -50,8 +50,8 @@ import { renderHistory, updateCounters, updateDirectionButtons } from "../dom.js
  * @property {number} cameraY
  * @property {boolean} ready
  * @property {GameState} latestWorld
- * @property {number} originX - Coordonnée monde X fixée à la première vue ; ne suit pas les mouvements du joueur
- * @property {number} originY - Coordonnée monde Y fixée à la première vue ; ne suit pas les mouvements du joueur
+ * @property {number} originX - World X coordinate fixed on first view; does not follow player movements
+ * @property {number} originY - World Y coordinate fixed on first view; does not follow player movements
  * @property {DragState | null} dragState
  * @property {ResizeObserver | null} resizeObserver
  * @property {boolean} hasFatalError
@@ -195,8 +195,8 @@ function layoutCubes(sceneState, cubes) {
   const gapX = 80;
   const gapY = 80;
 
-  // L'origine est fixée une seule fois depuis la position initiale du joueur.
-  // Elle ne suit pas les déplacements — seul le pan manuel déplace la caméra.
+  // The origin is fixed once from the player's initial position.
+  // It does not follow movement — only manual pan moves the camera.
   if (!Number.isFinite(sceneState.originX)) {
     const myCube = cubes.find((cube) => cube.id === sceneState.myCubeId);
     if (myCube && Number.isFinite(myCube.x)) {

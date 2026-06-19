@@ -1,7 +1,7 @@
 // @ts-check
 /**
  * @file src/game/index.js
- * @description Point d'entrée du module jeu. Ré-exporte les éléments publics de la couche métier.
+ * @description Game module entry point. Re-exports the public elements of the business layer.
  */
 
 const { CubeWorldGame } = require("./cube-world-game");

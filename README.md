@@ -1,87 +1,87 @@
 # Cubematel
 
-Jeu temps réel Node.js inspiré de Cube World, avec serveur Socket.IO et rendu PixiJS.
+Real-time Node.js game inspired by Cube World, with a Socket.IO server and PixiJS rendering.
 
-## Lancement
+## Getting started
 
 ```bash
 npm install
 npm start
 ```
 
-Le projet écoute sur `http://localhost:3000`.
+The project listens on `http://localhost:3000`.
 
-## Commandes
+## Commands
 
-| Commande | Rôle |
+| Command | Role |
 |---|---|
-| `npm start` | démarre le serveur |
-| `npm test` | exécute les tests de logique |
+| `npm start` | starts the server |
+| `npm test` | runs the logic tests |
 
 ## Architecture
 
 ```text
 src/server.js
-  -> bootstrap HTTP et Socket.IO
+  -> Express + Socket.IO bootstrap
 src/socket-handlers.js
-  -> branche les événements Socket.IO
+  -> wires Socket.IO events
 src/game.js
-  -> compatibilité simple vers src/game/
+  -> simple compatibility shim for src/game/
 src/game/
-  -> logique de jeu, couleurs, coordonnées, mouvements
+  -> game logic, colours, coordinates, movements
 public/js/scene/
-  -> scène PixiJS : initialisation, animation, rendu, pan caméra, erreurs, fond
+  -> PixiJS scene: initialisation, animation, rendering, camera pan, errors, background
 public/js/renderers/
-  -> rendu des entités : cube LCD et stickman pixel art
+  -> entity rendering: LCD cube and pixel-art stickman
 public/js/dom.js
-  -> accès DOM, contrôles, badges, historique
+  -> DOM access, controls, badges, history
 ```
 
-## Règles métier
+## Business rules
 
-1. Un cube reçoit un personnage, une couleur et une position libre.
-2. Deux cubes sont voisins seulement s'ils sont adjacents orthogonalement.
-3. Une face ne peut accueillir qu'un seul voisin.
-4. Le serveur reste la source de vérité.
-5. L'historique public est limité aux 20 dernières entrées.
+1. A cube receives a character, a colour, and a free position.
+2. Two cubes are neighbours only if they are orthogonally adjacent.
+3. A face can only hold one neighbour.
+4. The server remains the single source of truth.
+5. The public history is limited to the last 20 entries.
 
-## Fichiers clés
+## Key files
 
-| Fichier | Responsabilité |
+| File | Responsibility |
 |---|---|
-| `src/game/cube-world-game.js` | état du monde et mutations |
-| `src/game/coordinates.js` | placement et alignement |
-| `src/game/colors.js` | sélection de couleur |
-| `src/game/movements.js` | traduction mouvement -> action |
-| `public/js/scene/index.js` | point d'entrée de la scène, factory `createScene` |
-| `public/js/scene/setup.js` | initialisation PixiJS et calques |
-| `public/js/scene/pan.js` | caméra et interactions de déplacement |
-| `public/js/scene/world.js` | rendu du snapshot serveur |
-| `public/js/scene/animation.js` | boucle d'animation par frame |
-| `public/js/scene/background.js` | étoiles et particules d'arrière-plan |
-| `public/js/scene/errors.js` | affichage d'erreurs fatales dans la scène |
-| `public/js/renderers/cube-node.js` | fabrique et rendu d'un nœud cube (frame LCD + figure) |
-| `public/js/renderers/stickman.js` | dessin pixel art du stickman et des icônes de prop |
+| `src/game/cube-world-game.js` | world state and mutations |
+| `src/game/coordinates.js` | placement and alignment |
+| `src/game/colors.js` | colour selection |
+| `src/game/movements.js` | movement → action translation |
+| `public/js/scene/index.js` | scene entry point, `createScene` factory |
+| `public/js/scene/setup.js` | PixiJS initialisation and layers |
+| `public/js/scene/pan.js` | camera and pan interactions |
+| `public/js/scene/world.js` | server snapshot rendering |
+| `public/js/scene/animation.js` | per-frame animation loop |
+| `public/js/scene/background.js` | stars and background particles |
+| `public/js/scene/errors.js` | fatal error display in the scene |
+| `public/js/renderers/cube-node.js` | cube node factory and rendering (LCD frame + figure) |
+| `public/js/renderers/stickman.js` | pixel-art stickman and prop icon drawing |
 
-## Structure des dossiers client
+## Client folder structure
 
 ```text
 public/js/
-├── scene/          # Scène PixiJS (setup, rendu monde, animation, pan, fond, erreurs)
-├── renderers/      # Entités visuelles (cube LCD, stickman pixel art)
-└── dom.js          # Accès et manipulation du DOM
+├── scene/          # PixiJS scene (setup, world rendering, animation, pan, background, errors)
+├── renderers/      # Visual entities (LCD cube, pixel-art stickman)
+└── dom.js          # DOM access and manipulation
 ```
 
-## Rendu visuel
+## Visual rendering
 
-Chaque cube est rendu comme un boîtier LCD inspiré du Cube World de Mattel :
+Each cube is rendered as an LCD unit inspired by Cube World by Mattel:
 
-- **Cadre coloré** : bordure arrondie dans la couleur du personnage.
-- **Écran LCD** : fond gris foncé simulant un écran à cristaux liquides.
-- **Stickman pixel art** : personnage en blocs carrés noirs (4×4 px chacun).
-- **Poses** : les bras changent selon l'émotion (`surpris`, `joyeux`, `curieux`, défaut).
-- **Prop** : icône en bas de l'écran — ballon pour Dodger, lasso pour Whip.
+- **Coloured frame**: rounded border in the character's colour.
+- **LCD screen**: dark grey background simulating a liquid-crystal display.
+- **Pixel-art stickman**: character made of black square blocks (4×4 px each).
+- **Poses**: arms change according to emotion (`surpris`, `joyeux`, `curieux`, default).
+- **Prop**: icon at the bottom of the screen — ball for Dodger, lasso for Whip.
 
 ## Tests
 
-Les tests couvrent les mouvements, les connexions, les couleurs et l'alignement des cubes.
+Tests cover movements, connections, colours, and cube alignment.

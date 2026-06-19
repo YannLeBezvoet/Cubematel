@@ -1,10 +1,10 @@
 // @ts-check
 /**
  * @file src/game/colors.js
- * @description Sélection aléatoire de couleur pour les cubes.
+ * @description Random colour selection for cubes.
  *
- * Réutilise d'abord la palette prédéfinie avant de générer une couleur de secours
- * afin que chaque cube ait une apparence distincte tant que la palette le permet.
+ * Uses the predefined palette first before generating a fallback colour
+ * so each cube has a distinct appearance for as long as the palette allows.
  *
  * @dependencies src/game/constants.js
  */
@@ -16,9 +16,9 @@ const { CUBE_COLORS } = require("./constants");
  */
 
 /**
- * Choisit une couleur 0xRRGGBB disponible pour un nouveau cube.
- * Préfère les couleurs de la palette prédéfinie non encore utilisées ;
- * génère une couleur aléatoire distincte si la palette est épuisée.
+ * Picks an available 0xRRGGBB colour for a new cube.
+ * Prefers unused colours from the predefined palette;
+ * generates a distinct random colour if the palette is exhausted.
  *
  * @param {Map<string, Cube>} cubes - État courant des cubes du monde
  * @returns {number} Couleur au format 0xRRGGBB

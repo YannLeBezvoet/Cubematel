@@ -1,30 +1,30 @@
-# Cubematel — Contexte applicatif
+# Cubematel — Application Context
 
-> Ce fichier est la source d'orientation rapide pour tout travail sur ce dépôt.
-> Il doit être mis à jour à chaque changement qui modifie l'architecture, les modules,
-> les règles métier, les événements réseau ou les conventions visuelles.
+> This file is the quick-orientation reference for all work on this repository.
+> It must be updated whenever a change modifies the architecture, modules,
+> business rules, network events, or visual conventions.
 
 ---
 
-## Nature du projet
+## Project nature
 
-Cubematel est une recréation web temps réel du jouet **Cube World de Mattel** (2004).
-Chaque joueur connecté reçoit un cube LCD animé contenant un personnage pixel art.
-Les cubes peuvent être reliés entre eux — un joueur se déplace vers un cube cible en choisissant une face disponible (au-dessus, en dessous, à gauche, à droite).
-Le serveur est la seule source de vérité — le client ne mute jamais l'état localement.
+Cubematel is a real-time web recreation of the **Cube World by Mattel** toy (2004).
+Each connected player receives an animated LCD cube containing a pixel-art character.
+Cubes can be linked together — a player moves towards a target cube by choosing an available face (above, below, left, right).
+The server is the single source of truth — the client never mutates state locally.
 
-**Stack :**
-- Serveur : Node.js ≥ 18, Express v5, Socket.IO v4 (CommonJS)
-- Client : PixiJS v7 (via `/vendor`), GSAP v3 (via `/vendor`), ES modules natifs, Socket.IO client
-- Tests : Vitest (`npm test` = `vitest run`, `npm run test:watch` = `vitest`)
-- Typage : TypeScript en mode `checkJs + noEmit` — pas de compilation, vérification par `npm run typecheck`
-- Pas de bundler, pas de framework front
+**Stack:**
+- Server: Node.js ≥ 18, Express v5, Socket.IO v4 (CommonJS)
+- Client: PixiJS v7 (via `/vendor`), GSAP v3 (via `/vendor`), native ES modules, Socket.IO client
+- Tests: Vitest (`npm test` = `vitest run`, `npm run test:watch` = `vitest`)
+- Typing: TypeScript in `checkJs + noEmit` mode — no compilation, verified via `npm run typecheck`
+- No bundler, no front-end framework
 
-**Démarrage :**
+**Getting started:**
 ```bash
 npm install && npm start        # http://localhost:3000
-npm test                        # tests unitaires (Vitest)
-npm run typecheck               # vérification TypeScript (noEmit)
+npm test                        # unit tests (Vitest)
+npm run typecheck               # TypeScript check (noEmit)
 ```
 
 ---
@@ -33,124 +33,124 @@ npm run typecheck               # vérification TypeScript (noEmit)
 
 ```
 types/
-└── cube.d.ts              # Source de vérité partagée : interfaces Cube, HistoryEntry, GameState
+└── cube.d.ts              # Shared source of truth: Cube, HistoryEntry, GameState interfaces
 
 src/
-├── server.js              # Bootstrap Express + Socket.IO ; exporte { app, server, game }
-├── socket-handlers.js     # Branche les événements Socket.IO ; appelle game.* puis broadcastWorld
+├── server.js              # Express + Socket.IO bootstrap; exports { app, server, game }
+├── socket-handlers.js     # Wires Socket.IO events; calls game.* then broadcastWorld
 └── game/
-    ├── index.js           # Ré-export de CubeWorldGame, CHARACTERS, CUBE_COLORS
-    ├── cube-world-game.js # Classe CubeWorldGame — état du monde (Map<id, cube>) ; @ts-check
-    ├── constants.js       # CHARACTERS = ['Dodger','Whip'] ; CUBE_COLORS (12 couleurs hex)
-    ├── coordinates.js     # Placement et connexion des cubes sur la grille
-    ├── movements.js       # Traduit un mouvement UI → { emotion, activity, orientation? }
-    └── colors.js          # Sélection aléatoire d'une couleur disponible
+    ├── index.js           # Re-exports CubeWorldGame, CHARACTERS, CUBE_COLORS
+    ├── cube-world-game.js # CubeWorldGame class — world state (Map<id, cube>); @ts-check
+    ├── constants.js       # CHARACTERS = ['Dodger','Whip']; CUBE_COLORS (12 hex colours)
+    ├── coordinates.js     # Cube placement and connection on the grid
+    ├── movements.js       # Translates a UI movement → { emotion, activity, orientation? }
+    └── colors.js          # Picks a random available colour
 
 public/
-├── index.html             # Point d'entrée HTML ; charge PIXI + GSAP via /vendor, puis app.js
-├── app.js                 # Point d'entrée client : crée socket, scène, bind contrôles
+├── index.html             # HTML entry point; loads PIXI + GSAP via /vendor, then app.js
+├── app.js                 # Client entry point: creates socket, scene, binds controls
 ├── styles.css
-├── tsconfig.json          # Config TS client (ESNext + DOM, checkJs:false, noEmit)
+├── tsconfig.json          # Client TS config (ESNext + DOM, checkJs:false, noEmit)
 └── js/
-    ├── globals.d.ts       # Étend Window : window.PIXI (PixiJS) et window.gsap (GSAP)
-    ├── dom.js             # getDomRefs, bindControls, setSelfBadge, historique DOM
+    ├── globals.d.ts       # Extends Window: window.PIXI (PixiJS) and window.gsap (GSAP)
+    ├── dom.js             # getDomRefs, bindControls, setSelfBadge, DOM history
     ├── scene/
-    │   ├── index.js       # createScene() — factory ; expose setMyCubeId / handleWorldUpdate / setup
-    │   ├── setup.js       # Initialisation PixiJS, calques, ResizeObserver, fond, ticker
-    │   ├── world.js       # renderWorld() — diff cubeNodes, tweens GSAP position/flip, historique ; @ts-check
-    │   ├── animation.js   # Boucle ticker : bobbing sinusoïdal uniquement (lerp et flip délégués à GSAP)
-    │   ├── pan.js         # Caméra drag et déplacement des calques
-    │   ├── background.js  # Étoiles + particules flottantes (décor)
-    │   └── errors.js      # showSceneError() — message d'erreur fatal dans la scène
+    │   ├── index.js       # createScene() — factory; exposes setMyCubeId / handleWorldUpdate / setup
+    │   ├── setup.js       # PixiJS initialisation, layers, ResizeObserver, background, ticker
+    │   ├── world.js       # renderWorld() — diff cubeNodes, GSAP position/flip tweens, history; @ts-check
+    │   ├── animation.js   # Ticker loop: sinusoidal bobbing only (lerp and flip delegated to GSAP)
+    │   ├── pan.js         # Camera drag and layer movement
+    │   ├── background.js  # Stars + floating particles (decoration)
+    │   └── errors.js      # showSceneError() — fatal error message in the scene
     └── renderers/
-        ├── cube-node.js   # createCubeNode / drawCube — conteneur PIXI d'un cube ; @ts-check
-        └── stickman.js    # drawStickman / drawProp — pixel art (grille P=3px)
+        ├── cube-node.js   # createCubeNode / drawCube — PIXI container for a cube; @ts-check
+        └── stickman.js    # drawStickman / drawProp — pixel art (P=3px grid)
 
-tsconfig.json              # Config TS serveur (CommonJS, checkJs:false, noEmit)
-vitest.config.mjs          # Configuration Vitest (environment: node)
+tsconfig.json              # Server TS config (CommonJS, checkJs:false, noEmit)
+vitest.config.mjs          # Vitest configuration (environment: node)
 ```
 
 ---
 
-## Modèle de données (cube)
+## Data model (cube)
 
 ```js
 {
   id: string,            // socket.id
-  playerName: string,    // "Joueur-XXXX"
-  color: number,         // 0xRRGGBB (un des 12 CUBE_COLORS)
+  playerName: string,    // "Player-XXXX"
+  color: number,         // 0xRRGGBB (one of the 12 CUBE_COLORS)
   character: string,     // "Dodger" | "Whip"
   orientation: string,   // "upright" | "upside_down"
-  emotion: string,       // "happy" | "surpris" | "joyeux" | "curieux" | "désorienté"
-  activity: string,      // description texte de l'activité courante
-  connectedTo: string[], // ids des cubes adjacents (recalculé par _syncConnections)
-  x: number,             // position sur la grille logique
+  emotion: string,       // "happy" | "surprised" | "joyful" | "curious" | "disoriented"
+  activity: string,      // text description of the current activity
+  connectedTo: string[], // ids of adjacent cubes (recomputed by _syncConnections)
+  x: number,             // position on the logical grid
   y: number,
 }
 ```
 
-**État diffusé :** `game.getState()` → `{ cubes: cube[], history: { text, timestamp }[] }` (20 dernières entrées)
+**Broadcast state:** `game.getState()` → `{ cubes: cube[], history: { text, timestamp }[] }` (last 20 entries)
 
 ---
 
-## Événements Socket.IO
+## Socket.IO events
 
-| Direction      | Événement         | Payload                            | Effet                                      |
-|----------------|-------------------|------------------------------------|--------------------------------------------|
-| Serveur→Client | `world:update`    | `{ cubes, history }`               | Snapshot complet du monde                  |
-| Client→Serveur | `cube:move`       | `{ movement }` (shake/flip/tilt/play) | Met à jour émotion + activité du cube   |
-| Client→Serveur | `cubes:connect`   | `{ targetId, direction }` (`"above"/"below"/"left"/"right"`) | Déplace le joueur sur la face indiquée du cube cible |
-| (auto)         | `connect`         | —                                  | Crée un cube pour le nouveau socket        |
-| (auto)         | `disconnect`      | —                                  | Supprime le cube et recalcule les liens    |
-
----
-
-## Règles métier clés
-
-1. Chaque joueur possède exactement un cube, identifié par son `socket.id`.
-2. Deux cubes sont voisins uniquement s'ils sont **adjacents orthogonalement** (Δx=1,Δy=0 ou Δx=0,Δy=1).
-3. Lors d'une connexion, c'est le **joueur (source) qui se déplace** vers la face choisie du cube cible — la cible reste immobile.
-4. Une face est indisponible si une autre cube l'occupe déjà ; l'UI désactive ces faces automatiquement depuis l'état monde reçu.
-5. La couleur est choisie aléatoirement parmi les couleurs non encore utilisées.
-6. `_syncConnections` reconstruit `connectedTo` depuis les coordonnées à chaque mutation.
-7. L'historique public est limité aux **20 dernières entrées**.
+| Direction      | Event             | Payload                            | Effect                                         |
+|----------------|-------------------|------------------------------------|------------------------------------------------|
+| Server→Client  | `world:update`    | `{ cubes, history }`               | Full world snapshot                            |
+| Client→Server  | `cube:move`       | `{ movement }` (shake/flip/tilt/play) | Updates cube emotion + activity             |
+| Client→Server  | `cubes:connect`   | `{ targetId, direction }` (`"above"/"below"/"left"/"right"`) | Moves the player to the indicated face of the target cube |
+| (auto)         | `connect`         | —                                  | Creates a cube for the new socket              |
+| (auto)         | `disconnect`      | —                                  | Removes the cube and recomputes links          |
 
 ---
 
-## Rendu visuel (PixiJS)
+## Key business rules
 
-Chaque cube est un `PIXI.Container` avec les couches (de bas en haut) :
-`plate` (ombre) → `halo` (glow coloré) → `cubeShape` (cadre + écran LCD) → `figure` (stickman) → `prop` (icône personnage)
-
-**Stickman :** grille pixel art, 1 unité = P=3px. Origine = centre des hanches.
-- Pose des bras selon `emotion` : `surpris`→wide, `joyeux`→play (Dodger/Whip différent), `curieux`→curious, default→down.
-- `upside_down` : `figure.scale.y = -1`, `figure.y = -19` (gravité inversée).
-- Props : ballon (Dodger) ou lasso (Whip), toujours en bas de l'écran LCD.
-
-**Animations :**
-- **Bobbing** : sinusoïdal par frame dans le ticker Pixi (`animation.js`), intensité selon l'émotion.
-- **Transition de position** : `gsap.to(node, { x, y, duration: 0.35, ease: 'power2.out' })` déclenché depuis `world.js/layoutCubes` à chaque `world:update`.
-- **Flip d'orientation** : `gsap.to(node.body, { rotation: Math.PI, ease: 'sine.inOut' })` depuis `world.js/startFlipAnimation` ; `drawCube` rappelé dans `onComplete`. L'état en cours est tracé via `node.flipping` (booléen) et `node._pendingCube`.
+1. Each player owns exactly one cube, identified by their `socket.id`.
+2. Two cubes are neighbours only if they are **orthogonally adjacent** (Δx=1,Δy=0 or Δx=0,Δy=1).
+3. On connection, it is the **player (source) who moves** to the chosen face of the target cube — the target stays still.
+4. A face is unavailable if another cube already occupies it; the UI disables those faces automatically from the received world state.
+5. Colour is chosen randomly from unused colours.
+6. `_syncConnections` rebuilds `connectedTo` from coordinates on every mutation.
+7. The public history is limited to the **last 20 entries**.
 
 ---
 
-## Conventions importantes
+## Visual rendering (PixiJS)
 
-- Le serveur n'émet **jamais** vers un socket individuel — tout passe par `io.emit('world:update', ...)`.
-- `src/game.js` est un shim de compatibilité qui ré-exporte `src/game/index.js`.
-- Les modules client utilisent **ES modules natifs** (`import/export`) ; les modules serveur utilisent **CommonJS** (`require/module.exports`).
-- `public/js/package.json` déclare `"type": "module"` pour activer les ES modules dans le dossier client.
-- `window.PIXI` et `window.gsap` sont chargés via `<script src="/vendor/...">` et déclarés dans `public/js/globals.d.ts`.
-- Le type `Cube` (et `HistoryEntry`, `GameState`) est défini **une seule fois** dans `types/cube.d.ts` et importé via JSDoc `@typedef {import('...')}` côté serveur et client.
-- **TypeScript** : `// @ts-check` activé par fichier sur les modules complexes (`cube-world-game.js`, `cube-node.js`, `world.js`). Pas de compilation — `npm run typecheck` (tsc noEmit) pour vérifier.
+Each cube is a `PIXI.Container` with layers (bottom to top):
+`plate` (shadow) → `halo` (coloured glow) → `cubeShape` (frame + LCD screen) → `figure` (stickman) → `prop` (character icon)
+
+**Stickman:** pixel-art grid, 1 unit = P=3px. Origin = hip centre.
+- Arm pose by `emotion`: `surprised`→wide, `joyful`→play (Dodger/Whip differ), `curious`→curious, default→down.
+- `upside_down`: `figure.scale.y = -1`, `figure.y = -19` (inverted gravity).
+- Props: ball (Dodger) or lasso (Whip), always at the bottom of the LCD screen.
+
+**Animations:**
+- **Bobbing**: sinusoidal per frame in the Pixi ticker (`animation.js`), intensity by emotion.
+- **Position transition**: `gsap.to(node, { x, y, duration: 0.35, ease: 'power2.out' })` triggered from `world.js/layoutCubes` on each `world:update`.
+- **Orientation flip**: `gsap.to(node.body, { rotation: Math.PI, ease: 'sine.inOut' })` from `world.js/startFlipAnimation`; `drawCube` called in `onComplete`. In-progress state tracked via `node.flipping` (boolean) and `node._pendingCube`.
 
 ---
 
-## Tests existants
+## Important conventions
 
-Runner : **Vitest** (`npm test` = `vitest run`, `npm run test:watch` = `vitest`).
+- The server **never** emits to an individual socket — everything goes through `io.emit('world:update', ...)`.
+- `src/game.js` is a compatibility shim that re-exports `src/game/index.js`.
+- Client modules use **native ES modules** (`import/export`); server modules use **CommonJS** (`require/module.exports`).
+- `public/js/package.json` declares `"type": "module"` to enable ES modules in the client folder.
+- `window.PIXI` and `window.gsap` are loaded via `<script src="/vendor/...">` and declared in `public/js/globals.d.ts`.
+- The `Cube` type (and `HistoryEntry`, `GameState`) is defined **once** in `types/cube.d.ts` and imported via JSDoc `@typedef {import('...')}` on both server and client.
+- **TypeScript**: `// @ts-check` enabled per file on complex modules (`cube-world-game.js`, `cube-node.js`, `world.js`). No compilation — `npm run typecheck` (tsc noEmit) to verify.
 
-| Fichier                    | Ce qu'il couvre                                                  |
-|----------------------------|------------------------------------------------------------------|
-| `test/game.test.mjs`       | Connexions, mouvements, couleurs, historique (format Vitest ESM) |
-| `test/stickman.test.mjs`   | Rendu stickman : coordonnées des pixels (format Vitest ESM)      |
+---
+
+## Existing tests
+
+Runner: **Vitest** (`npm test` = `vitest run`, `npm run test:watch` = `vitest`).
+
+| File                       | What it covers                                                     |
+|----------------------------|--------------------------------------------------------------------|
+| `test/game.test.mjs`       | Connections, movements, colours, history (Vitest ESM format)       |
+| `test/stickman.test.mjs`   | Stickman rendering: pixel coordinates (Vitest ESM format)          |

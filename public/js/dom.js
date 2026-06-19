@@ -1,18 +1,18 @@
 // @ts-check
 /**
  * @file dom.js
- * @description Centralise les accès DOM et les bindings d'événements.
+ * @description Centralises DOM access and event bindings.
  *
- * Responsabilités :
- *   - Fournir une référence unique à tous les éléments DOM utilisés.
- *   - Brancher les boutons sur les événements Socket.IO.
- *   - Mettre à jour l'état des boutons de direction en fonction des faces
- *     disponibles du cube cible sélectionné.
+ * Responsibilities:
+ *   - Provide a single reference to all DOM elements used.
+ *   - Wire buttons to Socket.IO events.
+ *   - Update the direction button state based on the available
+ *     faces of the selected target cube.
  *
- * @dependencies Socket.IO (via paramètre), DOM natif
+ * @dependencies Socket.IO (via parameter), native DOM
  */
 
-/** Décalages de position pour chaque direction (relatifs au cube cible). */
+/** Position offsets for each direction (relative to the target cube). */
 /** @type {Record<string, [number, number]>} */
 const DIRECTION_OFFSETS = {
   above: [0, -1],
@@ -22,7 +22,7 @@ const DIRECTION_OFFSETS = {
 };
 
 /**
- * Retourne les références aux éléments DOM utilisés par l'application.
+ * Returns references to the DOM elements used by the application.
  *
  * @returns {{ historyList: HTMLElement, targetInput: HTMLInputElement, directionButtons: HTMLButtonElement[], selfBadge: HTMLElement, cubeCount: HTMLElement, linkCount: HTMLElement, cubeScene: HTMLElement }}
  */
@@ -39,7 +39,7 @@ export function getDomRefs() {
 }
 
 /**
- * Branche les boutons de la page sur les événements Socket.IO.
+ * Wires the page buttons to Socket.IO events.
  *
  * @param {{ socket: any, targetInput: HTMLInputElement, directionButtons: HTMLButtonElement[] }} params
  */
@@ -62,34 +62,34 @@ export function bindControls({ socket, targetInput, directionButtons }) {
 }
 
 /**
- * Affiche l'identité locale du joueur connecté.
+ * Displays the local identity of the connected player.
  *
  * @param {HTMLElement} selfBadge
  * @param {string} cubeId
  */
 export function setSelfBadge(selfBadge, cubeId) {
-  selfBadge.textContent = `Mon cube : ${cubeId.slice(0, 6)}`;
+  selfBadge.textContent = `My cube: ${cubeId.slice(0, 6)}`;
 }
 
 /**
- * Met à jour les compteurs visibles dans l'interface.
+ * Updates the visible counters in the UI.
  *
  * @param {{ cubeCount: HTMLElement, linkCount: HTMLElement, cubeTotal: number, linkTotal: number }} params
  */
 export function updateCounters({ cubeCount, linkCount, cubeTotal, linkTotal }) {
   cubeCount.textContent = `${cubeTotal} ${cubeTotal > 1 ? "cubes" : "cube"}`;
-  linkCount.textContent = `${linkTotal} ${linkTotal > 1 ? "liens" : "lien"}`;
+  linkCount.textContent = `${linkTotal} ${linkTotal > 1 ? "links" : "link"}`;
 }
 
 /**
- * Active ou désactive les boutons de direction selon les faces disponibles
- * du cube cible dans l'état monde courant.
- * Une face est indisponible si une autre cube l'occupe déjà.
- * Paramètre directionButtons peut être undefined lors du rendu initial (état vide, aucun nœud cliquable).
+ * Enables or disables the direction buttons based on the available
+ * faces of the target cube in the current world state.
+ * A face is unavailable if another cube already occupies it.
+ * directionButtons may be undefined during the initial render (empty state, no clickable node).
  *
  * @param {HTMLButtonElement[] | undefined} directionButtons
  * @param {Array<{ id: string, x: number, y: number }>} cubes - Snapshot monde
- * @param {string} targetId - ID du cube cible sélectionné
+ * @param {string} targetId - ID of the selected target cube
  */
 export function updateDirectionButtons(directionButtons, cubes, targetId) {
   if (!directionButtons) return;
@@ -114,14 +114,14 @@ export function updateDirectionButtons(directionButtons, cubes, targetId) {
 }
 
 /**
- * Rend l'historique serveur dans l'ordre inverse de lecture.
+ * Renders the server history in reverse chronological order.
  *
  * @param {HTMLElement} historyList
  * @param {Array<{ text: string, timestamp: number }>} history
  */
 export function renderHistory(historyList, history) {
   if (!history.length) {
-    historyList.innerHTML = '<li class="empty-state">La ville attend ses premiers mouvements.</li>';
+    historyList.innerHTML = '<li class="empty-state">The town is waiting for its first moves.</li>';
     return;
   }
 
@@ -140,7 +140,7 @@ export function renderHistory(historyList, history) {
 }
 
 /**
- * Échappe les contenus texte avant insertion dans le DOM.
+ * Escapes text content before insertion into the DOM.
  *
  * @param {string} value
  * @returns {string}

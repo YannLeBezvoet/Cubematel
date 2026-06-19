@@ -5,7 +5,7 @@
  *
  * Draws stickman figures and character prop icons using PIXI.js Graphics.
  * Each figure "pixel" is a P×P filled square block, simulating the chunky
- * LCD look of classic handheld games (à la Cube World by Mattel).
+ * LCD look of classic handheld games (inspired by Cube World by Mattel).
  *
  * Body parts are independent functions accepting offset parameters, making
  * the design animation-ready for future frame-by-frame movement.
@@ -181,14 +181,14 @@ function drawArmsCurious(gfx) {
  *
  * @param {any} gfx
  * @param {string} emotion   - Emotion key driving the pose choice
- * @param {string} character - 'Dodger' | 'Whip' (used for joyeux split)
+ * @param {string} character - 'Dodger' | 'Whip' (used for joyful split)
  */
 function drawArms(gfx, emotion, character) {
   switch (emotion) {
-    case "surpris": return drawArmsWide(gfx);
-    case "joyeux":  return character === "Dodger" ? drawArmsPlayDodger(gfx) : drawArmsPlayWhip(gfx);
-    case "curieux": return drawArmsCurious(gfx);
-    default:        return drawArmsDown(gfx);
+    case "surprised": return drawArmsWide(gfx);
+    case "joyful":    return character === "Dodger" ? drawArmsPlayDodger(gfx) : drawArmsPlayWhip(gfx);
+    case "curious":   return drawArmsCurious(gfx);
+    default:          return drawArmsDown(gfx);
   }
 }
 
@@ -237,7 +237,7 @@ function drawRope(gfx) {
  * Assembles: head → neck → torso → arms (pose-dependent) → legs → feet.
  *
  * @param {any} gfx    - Figure Graphics object (figure-local coords)
- * @param {string} emotion       - 'happy' | 'surpris' | 'joyeux' | 'curieux' | 'désorienté'
+ * @param {string} emotion       - 'happy' | 'surprised' | 'joyful' | 'curious' | 'disoriented'
  * @param {string} character     - 'Dodger' | 'Whip'
  */
 export function drawStickman(gfx, emotion, character) {

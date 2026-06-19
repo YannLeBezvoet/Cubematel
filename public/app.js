@@ -1,12 +1,12 @@
 // @ts-check
 /**
  * @file public/app.js
- * @description Point d'entrée du client Cubematel.
+ * @description Entry point for the Cubematel client.
  *
- * Responsabilités :
- *   - Créer la connexion Socket.IO.
- *   - Initialiser la scène PixiJS via createScene.
- *   - Brancher les événements serveur sur la scène et l'interface DOM.
+ * Responsibilities:
+ *   - Create the Socket.IO connection.
+ *   - Initialise the PixiJS scene via createScene.
+ *   - Wire server events to the scene and DOM interface.
  *
  * @dependencies js/dom.js, js/scene/index.js, Socket.IO client (global io)
  */
@@ -27,7 +27,7 @@ socket.on("connect", () => {
 
 socket.on("world:update", (/** @type {import('../types/cube.js').GameState} */ state) => {
   scene.handleWorldUpdate(state);
-  // Rafraîchit les boutons de direction si une cible est déjà sélectionnée.
+  // Refreshes direction buttons if a target is already selected.
   const targetId = dom.targetInput.value.trim();
   if (targetId) {
     updateDirectionButtons(dom.directionButtons, state.cubes, targetId);

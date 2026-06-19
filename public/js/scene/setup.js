@@ -30,7 +30,7 @@ import { applyCameraTransform, setupPanInteractions, updatePanOverlay } from "./
 export function setupScene(sceneState, refs) {
   const { cubeScene } = refs;
   if (!window.PIXI) {
-    cubeScene.innerHTML = '<div class="empty-state">PixiJS introuvable. Recharge la page.</div>';
+    cubeScene.innerHTML = '<div class="empty-state">PixiJS not found. Please reload the page.</div>';
     return;
   }
 
@@ -45,8 +45,8 @@ export function setupScene(sceneState, refs) {
       resizeTo: cubeScene,
     });
   } catch (error) {
-    console.error("Impossible d'initialiser PixiJS", error);
-    showSceneError(sceneState, cubeScene, "Impossible de lancer la scène 2D sur ce navigateur.");
+    console.error("Failed to initialise PixiJS", error);
+    showSceneError(sceneState, cubeScene, "Unable to start the 2D scene in this browser.");
     return;
   }
 
@@ -76,9 +76,9 @@ export function setupScene(sceneState, refs) {
     try {
       animate(sceneState, delta);
     } catch (error) {
-      console.error("Erreur de rendu PixiJS", error);
+      console.error("PixiJS render error", error);
       app.ticker.stop();
-      showSceneError(sceneState, cubeScene, "Erreur de rendu de la scène 2D.");
+      showSceneError(sceneState, cubeScene, "2D scene render error.");
     }
   });
 
@@ -108,7 +108,7 @@ export function setupScene(sceneState, refs) {
     renderWorld(sceneState, sceneState.latestWorld, refs);
     applyCameraTransform(sceneState);
   } catch (error) {
-    console.error("Erreur de synchronisation de la scène", error);
-    showSceneError(sceneState, cubeScene, "Impossible d'afficher les cubes dans la scène 2D.");
+    console.error("Scene sync error", error);
+    showSceneError(sceneState, cubeScene, "Unable to display cubes in the 2D scene.");
   }
 }

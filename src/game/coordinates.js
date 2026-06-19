@@ -1,19 +1,19 @@
 // @ts-check
 /**
  * @file coordinates.js
- * @description Logique de positionnement des cubes sur la grille 2D.
+ * @description Cube positioning logic on the 2D grid.
  *
- * Responsabilités :
- *   - Assigner des coordonnées initiales aux cubes sans position.
- *   - Déplacer le cube source (joueur) pour qu'il se colle sur une face
- *     spécifique du cube cible.
- *   - Vérifier la disponibilité d'une case.
+ * Responsibilities:
+ *   - Assign initial coordinates to cubes that have no position.
+ *   - Move the source cube (player) to snap it onto a specific
+ *     face of the target cube.
+ *   - Check whether a cell is available.
  *
- * Directions disponibles : "above" | "below" | "left" | "right"
- * Chacune représente une face du cube CIBLE où le joueur vient se positionner.
+ * Available directions: "above" | "below" | "left" | "right"
+ * Each represents a face of the TARGET cube where the player positions themselves.
  */
 
-/** @type {Record<string, { dx: number, dy: number }>} Décalages de coordonnées pour chaque direction relative à la cible. */
+/** @type {Record<string, { dx: number, dy: number }>} Coordinate offsets for each direction relative to the target. */
 const DIRECTION_OFFSETS = {
   above: { dx: 0, dy: -1 },
   below: { dx: 0, dy: 1 },
@@ -22,7 +22,7 @@ const DIRECTION_OFFSETS = {
 };
 
 /**
- * Rattrape les cubes sans coordonnées pour éviter les états partiels.
+ * Catches cubes without coordinates to prevent partial states.
  *
  * @param {Map<string, import('../../types/cube.js').Cube>} cubes
  */
@@ -38,7 +38,7 @@ function ensureAllCoordinates(cubes) {
 }
 
 /**
- * Cherche la première case libre dans une grille simple et déterministe.
+ * Finds the first free cell in a simple, deterministic grid scan.
  *
  * @param {Map<string, import('../../types/cube.js').Cube>} cubes
  * @param {string} [ignoredCubeId]
@@ -57,7 +57,7 @@ function findFirstFreeCoordinate(cubes, ignoredCubeId) {
 }
 
 /**
- * Vérifie si une position est déjà occupée par un autre cube.
+ * Checks whether a position is already occupied by another cube.
  *
  * @param {Map<string, import('../../types/cube.js').Cube>} cubes
  * @param {number} x
@@ -72,7 +72,7 @@ function isPositionTaken(cubes, x, y, ignoredCubeId) {
 }
 
 /**
- * Retourne la position de la case adjacente à la cible dans la direction donnée.
+ * Returns the position of the cell adjacent to the target in the given direction.
  *
  * @param {{ x: number, y: number }} target
  * @param {string} direction
@@ -84,14 +84,14 @@ function targetFacePosition(target, direction) {
 }
 
 /**
- * Déplace le cube source (joueur) pour qu'il se colle sur la face indiquée
- * du cube cible. La cible reste immobile.
+ * Moves the source cube (player) to snap it onto the indicated face
+ * of the target cube. The target remains stationary.
  *
  * @param {Map<string, import('../../types/cube.js').Cube>} cubes
- * @param {string} sourceId - Identifiant du cube joueur (qui se déplace)
+ * @param {string} sourceId - Identifier of the player cube (the one that moves)
  * @param {string} targetId - Identifiant du cube cible (qui reste en place)
  * @param {string} direction - "above" | "below" | "left" | "right"
- * @returns {boolean} true si le déplacement a réussi ou était déjà effectué
+ * @returns {boolean} true if the move succeeded or was already performed
  */
 function moveSourceToTarget(cubes, sourceId, targetId, direction) {
   const source = cubes.get(sourceId);

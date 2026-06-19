@@ -1,12 +1,12 @@
 // @ts-check
 /**
  * @file src/server.js
- * @description Bootstrap Express + Socket.IO.
+ * @description Express + Socket.IO bootstrap.
  *
- * Responsabilités :
- *   - Créer l'application Express et le serveur HTTP.
- *   - Attacher Socket.IO et déléguer chaque connexion à registerSocketHandlers.
- *   - Servir les fichiers statiques du client et des vendors.
+ * Responsibilities:
+ *   - Create the Express application and HTTP server.
+ *   - Attach Socket.IO and delegate each connection to registerSocketHandlers.
+ *   - Serve static client files and vendor assets.
  *
  * @dependencies express, socket.io, src/game, src/socket-handlers
  */
@@ -34,7 +34,7 @@ const PORT = process.env.PORT || 3000;
 
 if (require.main === module) {
   server.listen(PORT, () => {
-    console.log(`Cube World en ligne démarré sur http://localhost:${PORT}`);
+    console.log(`Cube World online started on http://localhost:${PORT}`);
   });
 }
 

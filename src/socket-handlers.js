@@ -1,12 +1,12 @@
 // @ts-check
 /**
  * @file src/socket-handlers.js
- * @description Branchement des événements Socket.IO pour un cube connecté.
+ * @description Socket.IO event wiring for a connected cube.
  *
- * Responsabilités :
- *   - Associer les événements Socket.IO (cube:move, cubes:connect, disconnect)
- *     aux méthodes métier du jeu.
- *   - Diffuser l'état monde après chaque mutation via broadcastWorld.
+ * Responsibilities:
+ *   - Bind Socket.IO events (cube:move, cubes:connect, disconnect)
+ *     to the game business methods.
+ *   - Broadcast the world state after each mutation via broadcastWorld.
  *
  * @dependencies src/game
  */
@@ -18,14 +18,14 @@ const { CHARACTERS } = require("./game");
  */
 
 /**
- * Branche les événements Socket.IO d'un cube sur un même flux simple.
+ * Wires all Socket.IO events for a cube through a single handler.
  *
  * @param {import('socket.io').Server} io
  * @param {import('socket.io').Socket} socket
  * @param {CubeWorldGame} game
  */
 function registerSocketHandlers(io, socket, game) {
-  const playerName = `Joueur-${socket.id.slice(0, 4)}`;
+  const playerName = `Player-${socket.id.slice(0, 4)}`;
   const preferredCharacter = CHARACTERS[Math.floor(Math.random() * CHARACTERS.length)];
 
   game.createCube(socket.id, playerName, preferredCharacter);
@@ -48,7 +48,7 @@ function registerSocketHandlers(io, socket, game) {
 }
 
 /**
- * Diffuse l'état monde courant à tous les clients connectés.
+ * Broadcasts the current world state to all connected clients.
  *
  * @param {import('socket.io').Server} io
  * @param {CubeWorldGame} game
