@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * @file dom.js
  * @description Centralise les accès DOM et les bindings d'événements.
@@ -12,6 +13,7 @@
  */
 
 /** Décalages de position pour chaque direction (relatifs au cube cible). */
+/** @type {Record<string, [number, number]>} */
 const DIRECTION_OFFSETS = {
   above: [0, -1],
   below: [0, 1],
@@ -26,25 +28,26 @@ const DIRECTION_OFFSETS = {
  */
 export function getDomRefs() {
   return {
-    historyList: document.getElementById("history"),
-    targetInput: document.getElementById("targetId"),
-    directionButtons: [...document.querySelectorAll(".dir-btn")],
-    selfBadge: document.getElementById("selfBadge"),
-    cubeCount: document.getElementById("cubeCount"),
-    linkCount: document.getElementById("linkCount"),
-    cubeScene: document.getElementById("cubeScene"),
+    historyList: /** @type {HTMLElement} */ (document.getElementById("history")),
+    targetInput: /** @type {HTMLInputElement} */ (document.getElementById("targetId")),
+    directionButtons: /** @type {HTMLButtonElement[]} */ ([...document.querySelectorAll(".dir-btn")]),
+    selfBadge: /** @type {HTMLElement} */ (document.getElementById("selfBadge")),
+    cubeCount: /** @type {HTMLElement} */ (document.getElementById("cubeCount")),
+    linkCount: /** @type {HTMLElement} */ (document.getElementById("linkCount")),
+    cubeScene: /** @type {HTMLElement} */ (document.getElementById("cubeScene")),
   };
 }
 
 /**
  * Branche les boutons de la page sur les événements Socket.IO.
  *
- * @param {{ socket: object, targetInput: HTMLInputElement, directionButtons: HTMLButtonElement[] }} params
+ * @param {{ socket: any, targetInput: HTMLInputElement, directionButtons: HTMLButtonElement[] }} params
  */
 export function bindControls({ socket, targetInput, directionButtons }) {
   document.querySelectorAll("[data-move]").forEach((button) => {
+    const btn = /** @type {HTMLElement} */ (button);
     button.addEventListener("click", () => {
-      socket.emit("cube:move", { movement: button.dataset.move });
+      socket.emit("cube:move", { movement: btn.dataset.move });
     });
   });
 
@@ -82,17 +85,19 @@ export function updateCounters({ cubeCount, linkCount, cubeTotal, linkTotal }) {
  * Active ou désactive les boutons de direction selon les faces disponibles
  * du cube cible dans l'état monde courant.
  * Une face est indisponible si une autre cube l'occupe déjà.
+ * Paramètre directionButtons peut être undefined lors du rendu initial (état vide, aucun nœud cliquable).
  *
- * @param {HTMLButtonElement[]} directionButtons
+ * @param {HTMLButtonElement[] | undefined} directionButtons
  * @param {Array<{ id: string, x: number, y: number }>} cubes - Snapshot monde
  * @param {string} targetId - ID du cube cible sélectionné
  */
 export function updateDirectionButtons(directionButtons, cubes, targetId) {
+  if (!directionButtons) return;
   const target = cubes?.find((c) => c.id === targetId);
 
   directionButtons.forEach((btn) => {
     const dir = btn.dataset.dir;
-    if (!target) {
+    if (!target || !dir) {
       btn.disabled = true;
       btn.classList.remove("selected");
       return;
@@ -144,6 +149,7 @@ export function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, (char) => HTML_ESCAPE_MAP[char]);
 }
 
+/** @type {Record<string, string>} */
 const HTML_ESCAPE_MAP = {
   "&": "&amp;",
   "<": "&lt;",

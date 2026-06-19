@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * @file scene/index.js
  * @description Entry point for the 2D cube scene.
@@ -7,12 +8,22 @@
  * (setup, animation, pan, world, errors, background) are internal to the scene.
  *
  * @dependencies scene/setup.js, scene/world.js, scene/errors.js
+ *
+ * @typedef {import('./world.js').SceneState} SceneState
+ * @typedef {import('./world.js').GameState} GameState
  */
 
 import { showSceneError } from "./errors.js";
 import { setupScene } from "./setup.js";
 import { renderWorld } from "./world.js";
 
+/**
+ * Factory that creates and returns the public scene API.
+ * The returned object is the only interface consumers need.
+ *
+ * @param {{ cubeScene: HTMLElement, targetInput: HTMLInputElement, directionButtons: HTMLButtonElement[], cubeCount: HTMLElement, linkCount: HTMLElement, historyList: HTMLElement }} refs
+ * @returns {{ setMyCubeId: (id: string) => void, handleWorldUpdate: (state: GameState) => void, setup: () => void }}
+ */
 export function createScene({
   cubeScene,
   targetInput,
@@ -32,7 +43,7 @@ export function createScene({
     links: [],
     stars: [],
     floaters: [],
-    latestWorld: { cubes: [], history: [] },
+    latestWorld: /** @type {GameState} */ ({ cubes: [], history: [] }),
     originX: NaN,
     originY: NaN,
     ready: false,

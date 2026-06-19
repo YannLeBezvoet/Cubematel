@@ -18,4 +18,7 @@ declare global {
     /** GSAP global, injected by /vendor/gsap/dist/gsap.min.js */
     gsap: typeof gsap;
   }
+
+  /** Socket.IO client, injected by /socket.io/socket.io.js */
+  function io(...args: any[]): any;
 }

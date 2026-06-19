@@ -18,6 +18,19 @@ import { renderHistory, updateCounters, updateDirectionButtons } from "../dom.js
 
 /**
  * @typedef {import('../renderers/cube-node.js').Cube} Cube
+ * @typedef {import('../../../types/cube.js').HistoryEntry} HistoryEntry
+ * @typedef {import('../../../types/cube.js').GameState} GameState
+ */
+
+/**
+ * @typedef {Object} DragState
+ * @property {boolean} active
+ * @property {number | null} pointerId
+ * @property {number} startX
+ * @property {number} startY
+ * @property {number} startCameraX
+ * @property {number} startCameraY
+ * @property {boolean} dragged
  */
 
 /**
@@ -32,15 +45,16 @@ import { renderHistory, updateCounters, updateDirectionButtons } from "../dom.js
  * @property {string[][]} links
  * @property {Array<{sprite: any, speed: number, drift: number}>} stars
  * @property {Array<{sprite: any, velocityX: number, velocityY: number, phase: number}>} floaters
- * @property {string | null} myCubeId
+ * @property {string} myCubeId
  * @property {number} cameraX
  * @property {number} cameraY
  * @property {boolean} ready
- * @property {object | null} latestWorld
+ * @property {GameState} latestWorld
  * @property {number} originX - Coordonnée monde X fixée à la première vue ; ne suit pas les mouvements du joueur
  * @property {number} originY - Coordonnée monde Y fixée à la première vue ; ne suit pas les mouvements du joueur
- * @property {object | null} dragState
+ * @property {DragState | null} dragState
  * @property {ResizeObserver | null} resizeObserver
+ * @property {boolean} hasFatalError
  */
 
 /**
@@ -49,8 +63,8 @@ import { renderHistory, updateCounters, updateDirectionButtons } from "../dom.js
  * animations and redraws on state change.
  *
  * @param {SceneState} sceneState
- * @param {{ cubes: Cube[], history: object[] }} state
- * @param {{ targetInput: HTMLInputElement, directionButtons: HTMLButtonElement[], cubeCount: HTMLElement, linkCount: HTMLElement, historyList: HTMLElement }} refs
+ * @param {GameState} state
+ * @param {{ targetInput: HTMLInputElement, directionButtons?: HTMLButtonElement[], cubeCount: HTMLElement, linkCount: HTMLElement, historyList: HTMLElement }} refs
  */
 export function renderWorld(sceneState, state, refs) {
   sceneState.latestWorld = state;
@@ -139,14 +153,14 @@ function collectUniqueLinks(cubes) {
  *
  * @param {SceneState} sceneState
  * @param {Cube[]} cubes
- * @param {{ targetInput: HTMLInputElement, directionButtons: HTMLButtonElement[] }} refs
+ * @param {{ targetInput: HTMLInputElement, directionButtons?: HTMLButtonElement[] }} refs
  */
 function syncCubes(sceneState, cubes, refs) {
   const existingIds = new Set(sceneState.cubeNodes.keys());
 
   cubes.forEach((cube) => {
     if (!sceneState.cubeNodes.has(cube.id)) {
-      const onSelect = (id) => {
+      const onSelect = (/** @type {string} */ id) => {
         refs.targetInput.value = id;
         refs.targetInput.focus();
         updateDirectionButtons(refs.directionButtons, sceneState.latestWorld?.cubes ?? [], id);
@@ -185,7 +199,7 @@ function layoutCubes(sceneState, cubes) {
   // Elle ne suit pas les déplacements — seul le pan manuel déplace la caméra.
   if (!Number.isFinite(sceneState.originX)) {
     const myCube = cubes.find((cube) => cube.id === sceneState.myCubeId);
-    if (Number.isFinite(myCube?.x)) {
+    if (myCube && Number.isFinite(myCube.x)) {
       sceneState.originX = myCube.x;
       sceneState.originY = myCube.y;
     }

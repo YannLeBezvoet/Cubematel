@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * @file scene/setup.js
  * @description PixiJS initialisation and scene lifecycle management.
@@ -8,6 +9,8 @@
  *
  * @dependencies scene/background.js, scene/animation.js, scene/errors.js,
  *               scene/world.js, scene/pan.js
+ *
+ * @typedef {import('./world.js').SceneState} SceneState
  */
 
 import { buildBackground } from "./background.js";
@@ -16,6 +19,14 @@ import { showSceneError } from "./errors.js";
 import { renderWorld } from "./world.js";
 import { applyCameraTransform, setupPanInteractions, updatePanOverlay } from "./pan.js";
 
+/**
+ * Initialises the PixiJS application and all scene layers.
+ * Wires the resize observer and the animation ticker.
+ * Renders the buffered world state immediately after setup.
+ *
+ * @param {SceneState} sceneState
+ * @param {{ cubeScene: HTMLElement, targetInput: HTMLInputElement, cubeCount: HTMLElement, linkCount: HTMLElement, historyList: HTMLElement }} refs
+ */
 export function setupScene(sceneState, refs) {
   const { cubeScene } = refs;
   if (!window.PIXI) {
@@ -39,7 +50,7 @@ export function setupScene(sceneState, refs) {
     return;
   }
 
-  const view = app.view || app.canvas;
+  const view = /** @type {any} */ (app.view || (/** @type {any} */ (app)).canvas);
   cubeScene.appendChild(view);
   app.renderer.resize(Math.max(1, cubeScene.clientWidth), Math.max(1, cubeScene.clientHeight));
   cubeScene.classList.add("scene-pan-ready");

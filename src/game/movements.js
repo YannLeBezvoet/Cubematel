@@ -1,5 +1,32 @@
-// Traduit un mouvement de l'UI en réaction métier minimale.
+// @ts-check
+/**
+ * @file src/game/movements.js
+ * @description Traduction d'un mouvement UI en réaction métier.
+ *
+ * Responsabilités :
+ *   - Mapper les identifiants de mouvement ("shake", "flip", "tilt", "play")
+ *     vers les champs métier (emotion, activity, orientation).
+ *
+ * @dependencies Aucune (module autonome)
+ */
+
+/**
+ * @typedef {import('../../types/cube.js').Cube} Cube
+ */
+
+/**
+ * @typedef {{ emotion: string, activity: string, orientation?: string }} MovementAction
+ */
+
+/**
+ * Traduit un mouvement UI en réaction métier minimale.
+ *
+ * @param {string} movement - "shake" | "flip" | "tilt" | "play"
+ * @param {Cube} cube - État courant du cube effectuant le mouvement
+ * @returns {MovementAction | null} Action à appliquer, ou null si mouvement inconnu
+ */
 function getMovementAction(movement, cube) {
+  /** @type {Record<string, MovementAction>} */
   const actions = {
     shake: {
       emotion: "surpris",

@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * @file coordinates.js
  * @description Logique de positionnement des cubes sur la grille 2D.
@@ -12,7 +13,7 @@
  * Chacune représente une face du cube CIBLE où le joueur vient se positionner.
  */
 
-/** Décalages de coordonnées pour chaque direction relative à la cible. */
+/** @type {Record<string, { dx: number, dy: number }>} Décalages de coordonnées pour chaque direction relative à la cible. */
 const DIRECTION_OFFSETS = {
   above: { dx: 0, dy: -1 },
   below: { dx: 0, dy: 1 },

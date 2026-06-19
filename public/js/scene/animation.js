@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * @file scene/animation.js
  * @description Per-frame animation loop for the cube scene.

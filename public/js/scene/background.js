@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * @file scene/background.js
  * @description Animated background layer: drifting stars and floating particles.
@@ -6,8 +7,16 @@
  * `updateBackground` moves sprites each frame — called by scene/animation.js.
  *
  * No project-level imports — reads/writes sceneState and window.PIXI directly.
+ *
+ * @typedef {import('./world.js').SceneState} SceneState
  */
 
+/**
+ * Rebuilds stars and floaters for the current canvas size.
+ * Must be called on init and on every resize.
+ *
+ * @param {SceneState} sceneState
+ */
 export function buildBackground(sceneState) {
   const PIXI = window.PIXI;
   const width = sceneState.app.screen.width;
@@ -23,6 +32,13 @@ export function buildBackground(sceneState) {
   createFloaters(sceneState, texture, width, height);
 }
 
+/**
+ * Advances background sprite positions by one frame.
+ * Called every tick by scene/animation.js.
+ *
+ * @param {SceneState} sceneState
+ * @param {number} delta - PixiJS ticker delta (frames elapsed since last tick)
+ */
 export function updateBackground(sceneState, delta) {
   const width = sceneState.app.screen.width;
   const height = sceneState.app.screen.height;
@@ -52,6 +68,12 @@ export function updateBackground(sceneState, delta) {
   });
 }
 
+/**
+ * @param {SceneState} sceneState
+ * @param {any} texture - PIXI.Texture.WHITE
+ * @param {number} width
+ * @param {number} height
+ */
 function createStars(sceneState, texture, width, height) {
   const PIXI = window.PIXI;
   const starCount = 380;
@@ -73,6 +95,12 @@ function createStars(sceneState, texture, width, height) {
   }
 }
 
+/**
+ * @param {SceneState} sceneState
+ * @param {any} texture - PIXI.Texture.WHITE
+ * @param {number} width
+ * @param {number} height
+ */
 function createFloaters(sceneState, texture, width, height) {
   const PIXI = window.PIXI;
   const floaterCount = 160;

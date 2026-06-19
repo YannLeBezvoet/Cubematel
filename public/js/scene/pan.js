@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * @file scene/pan.js
  * @description Camera pan interactions for the cube scene.
@@ -7,9 +8,17 @@
  * overlay and apply the camera offset to the scene layers.
  *
  * No project-level imports — only reads/writes sceneState and window.PIXI.
+ *
+ * @typedef {import('./world.js').SceneState} SceneState
+ * @typedef {import('./world.js').DragState} DragState
  */
 
-// Gère le pan de caméra pour garder la scène principale simple.
+/**
+ * Initialises drag state and wires all pointer events onto the pan overlay.
+ * Must be called once after the PixiJS overlay is created.
+ *
+ * @param {SceneState} sceneState
+ */
 export function setupPanInteractions(sceneState) {
   sceneState.dragState = {
     active: false,
@@ -21,24 +30,25 @@ export function setupPanInteractions(sceneState) {
     dragged: false,
   };
 
-  const onPointerDown = (event) => {
+  const onPointerDown = (/** @type {any} */ event) => {
     if (typeof event.button === "number" && event.button !== 0) {
       return;
     }
-
-    sceneState.dragState.active = true;
-    sceneState.dragState.pointerId = event.pointerId;
+    const dragState = sceneState.dragState;
+    if (!dragState) return;
+    dragState.active = true;
+    dragState.pointerId = event.pointerId;
     const { x, y } = getPointerPosition(event);
-    sceneState.dragState.startX = x;
-    sceneState.dragState.startY = y;
-    sceneState.dragState.startCameraX = sceneState.cameraX;
-    sceneState.dragState.startCameraY = sceneState.cameraY;
-    sceneState.dragState.dragged = false;
+    dragState.startX = x;
+    dragState.startY = y;
+    dragState.startCameraX = sceneState.cameraX;
+    dragState.startCameraY = sceneState.cameraY;
+    dragState.dragged = false;
   };
 
-  const onPointerMove = (event) => {
+  const onPointerMove = (/** @type {any} */ event) => {
     const dragState = sceneState.dragState;
-    if (!dragState.active || dragState.pointerId !== event.pointerId) {
+    if (!dragState || !dragState.active || dragState.pointerId !== event.pointerId) {
       return;
     }
 
@@ -56,9 +66,9 @@ export function setupPanInteractions(sceneState) {
     applyCameraTransform(sceneState);
   };
 
-  const endDrag = (event) => {
+  const endDrag = (/** @type {any} */ event) => {
     const dragState = sceneState.dragState;
-    if (!dragState.active || dragState.pointerId !== event.pointerId) {
+    if (!dragState || !dragState.active || dragState.pointerId !== event.pointerId) {
       return;
     }
 
@@ -78,7 +88,12 @@ export function setupPanInteractions(sceneState) {
   window.addEventListener("pointercancel", endDrag);
 }
 
-// Redessine le voile invisible qui capte les interactions.
+/**
+ * Redraws the invisible overlay that captures pointer interactions.
+ * Must be called after every resize.
+ *
+ * @param {SceneState} sceneState
+ */
 export function updatePanOverlay(sceneState) {
   if (!sceneState.panOverlay || !sceneState.app) {
     return;
@@ -93,7 +108,12 @@ export function updatePanOverlay(sceneState) {
   sceneState.panOverlay.hitArea = new window.PIXI.Rectangle(0, 0, width, height);
 }
 
-// Applique le décalage de caméra aux calques utiles.
+/**
+ * Applies the current camera offset to links and cube layers.
+ * The background layer is kept at (0, 0) to remain fixed.
+ *
+ * @param {SceneState} sceneState
+ */
 export function applyCameraTransform(sceneState) {
   if (!sceneState.linksLayer || !sceneState.cubeLayer) {
     return;
@@ -106,6 +126,12 @@ export function applyCameraTransform(sceneState) {
   sceneState.cubeLayer.position.set(sceneState.cameraX, sceneState.cameraY);
 }
 
+/**
+ * Normalises a DOM PointerEvent or a PixiJS FederatedPointerEvent to {x, y}.
+ *
+ * @param {any} event
+ * @returns {{ x: number, y: number }}
+ */
 function getPointerPosition(event) {
   if (event.clientX !== undefined) {
     return { x: event.clientX, y: event.clientY };

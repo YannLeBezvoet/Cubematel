@@ -1,3 +1,4 @@
+// @ts-check
 /**
  * @file renderers/stickman.js
  * @description Pixel-art stickman renderer for the Cubematel LCD game aesthetic.
@@ -41,7 +42,7 @@ const P = 3;
 /**
  * Fills a single P×P grid cell at (col, row) in figure-local display coords.
  *
- * @param {PIXI.Graphics} gfx
+ * @param {any} gfx
  * @param {number} col - Grid column
  * @param {number} row - Grid row
  */
@@ -54,7 +55,7 @@ function cell(gfx, col, row) {
 /**
  * Draws the head as a 4×3 solid block at rows -8 to -6, cols -2 to +1.
  *
- * @param {PIXI.Graphics} gfx
+ * @param {any} gfx
  */
 function drawHead(gfx) {
   for (let r = -8; r <= -6; r++) {
@@ -67,7 +68,7 @@ function drawHead(gfx) {
 /**
  * Draws the neck as a 2×1 block at row -5, cols -1 to 0.
  *
- * @param {PIXI.Graphics} gfx
+ * @param {any} gfx
  */
 function drawNeck(gfx) {
   cell(gfx, -1, -5);
@@ -77,7 +78,7 @@ function drawNeck(gfx) {
 /**
  * Draws the torso as a 4×4 solid block at rows -4 to -1, cols -2 to +1.
  *
- * @param {PIXI.Graphics} gfx
+ * @param {any} gfx
  */
 function drawTorso(gfx) {
   for (let r = -4; r <= -1; r++) {
@@ -91,7 +92,7 @@ function drawTorso(gfx) {
  * Draws both legs (rows 0–2) and feet (row 3).
  * Each leg is 1 column wide; feet extend one cell outward on each side.
  *
- * @param {PIXI.Graphics} gfx
+ * @param {any} gfx
  * @param {number} [leftX=-2]  - Column for the left leg
  * @param {number} [rightX=1]  - Column for the right leg
  */
@@ -110,7 +111,7 @@ function drawLegs(gfx, leftX = -2, rightX = 1) {
 /**
  * Draws a single 2-segment arm using grid coordinates.
  *
- * @param {PIXI.Graphics} gfx
+ * @param {any} gfx
  * @param {number} col1 - Upper arm column
  * @param {number} row1 - Upper arm row
  * @param {number} col2 - Forearm column
@@ -128,7 +129,7 @@ function drawArm(gfx, col1, row1, col2, row2) {
 /**
  * Arms hanging down and outward (default idle pose).
  *
- * @param {PIXI.Graphics} gfx
+ * @param {any} gfx
  */
 function drawArmsDown(gfx) {
   drawArm(gfx, -3, -4, -4, -3);
@@ -138,7 +139,7 @@ function drawArmsDown(gfx) {
 /**
  * Arms spread wide horizontally (surprised emotion).
  *
- * @param {PIXI.Graphics} gfx
+ * @param {any} gfx
  */
 function drawArmsWide(gfx) {
   drawArm(gfx, -3, -4, -4, -4);
@@ -148,7 +149,7 @@ function drawArmsWide(gfx) {
 /**
  * Dodger play pose: right arm raised high, left arm down.
  *
- * @param {PIXI.Graphics} gfx
+ * @param {any} gfx
  */
 function drawArmsPlayDodger(gfx) {
   drawArm(gfx, -3, -4, -4, -3);
@@ -158,7 +159,7 @@ function drawArmsPlayDodger(gfx) {
 /**
  * Whip play pose: left arm raised high, right arm down.
  *
- * @param {PIXI.Graphics} gfx
+ * @param {any} gfx
  */
 function drawArmsPlayWhip(gfx) {
   drawArm(gfx, -3, -5, -4, -6);
@@ -168,7 +169,7 @@ function drawArmsPlayWhip(gfx) {
 /**
  * Curious pose: right arm extended horizontally (shielding eyes / pointing).
  *
- * @param {PIXI.Graphics} gfx
+ * @param {any} gfx
  */
 function drawArmsCurious(gfx) {
   drawArm(gfx, -3, -4, -4, -3);
@@ -178,7 +179,7 @@ function drawArmsCurious(gfx) {
 /**
  * Selects and draws the correct arm pose for the given emotion and character.
  *
- * @param {PIXI.Graphics} gfx
+ * @param {any} gfx
  * @param {string} emotion   - Emotion key driving the pose choice
  * @param {string} character - 'Dodger' | 'Whip' (used for joyeux split)
  */
@@ -201,7 +202,7 @@ const PP = 2;
  * At this cy the ball bottom aligns with the LCD bottom edge (y=32 in body coords).
  * When the prop container is flipped (upside_down), the ball mirrors to the LCD top.
  *
- * @param {PIXI.Graphics} gfx
+ * @param {any} gfx
  */
 function drawBall(gfx) {
   const cx = 0, cy = 28;
@@ -216,7 +217,7 @@ function drawBall(gfx) {
  * At this cy the rope bottom aligns with the LCD bottom edge (y=32 in body coords).
  * When the prop container is flipped (upside_down), the rope mirrors to the LCD top.
  *
- * @param {PIXI.Graphics} gfx
+ * @param {any} gfx
  */
 function drawRope(gfx) {
   const cx = 0, cy = 24;
@@ -235,7 +236,7 @@ function drawRope(gfx) {
  *
  * Assembles: head → neck → torso → arms (pose-dependent) → legs → feet.
  *
- * @param {PIXI.Graphics} gfx    - Figure Graphics object (figure-local coords)
+ * @param {any} gfx    - Figure Graphics object (figure-local coords)
  * @param {string} emotion       - 'happy' | 'surpris' | 'joyeux' | 'curieux' | 'désorienté'
  * @param {string} character     - 'Dodger' | 'Whip'
  */
@@ -257,7 +258,7 @@ export function drawStickman(gfx, emotion, character) {
  * The caller must clear the graphics object before calling this function.
  * Props are drawn regardless of emotion.
  *
- * @param {PIXI.Graphics} gfx  - Prop Graphics object (body-container coords)
+ * @param {any} gfx  - Prop Graphics object (body-container coords)
  * @param {string} character   - 'Dodger' | 'Whip'
  */
 export function drawProp(gfx, character) {
