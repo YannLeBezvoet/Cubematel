@@ -12,7 +12,6 @@
  */
 
 const path = require("path");
-// @ts-ignore — express v5 n'a pas de types bundlés, @types/express cible v4
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");

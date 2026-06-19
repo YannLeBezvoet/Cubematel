@@ -25,7 +25,7 @@ socket.on("connect", () => {
   setSelfBadge(dom.selfBadge, socket.id);
 });
 
-socket.on("world:update", (/** @type {any} */ state) => {
+socket.on("world:update", (/** @type {import('../types/cube.js').GameState} */ state) => {
   scene.handleWorldUpdate(state);
   // Rafraîchit les boutons de direction si une cible est déjà sélectionnée.
   const targetId = dom.targetInput.value.trim();

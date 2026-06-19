@@ -20,8 +20,8 @@ const { CHARACTERS } = require("./game");
 /**
  * Branche les événements Socket.IO d'un cube sur un même flux simple.
  *
- * @param {any} io     - Instance Socket.IO Server
- * @param {any} socket - Socket du client connecté
+ * @param {import('socket.io').Server} io
+ * @param {import('socket.io').Socket} socket
  * @param {CubeWorldGame} game
  */
 function registerSocketHandlers(io, socket, game) {
@@ -50,7 +50,7 @@ function registerSocketHandlers(io, socket, game) {
 /**
  * Diffuse l'état monde courant à tous les clients connectés.
  *
- * @param {any} io - Instance Socket.IO Server
+ * @param {import('socket.io').Server} io
  * @param {CubeWorldGame} game
  */
 function broadcastWorld(io, game) {
