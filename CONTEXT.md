@@ -173,3 +173,4 @@ Runner: **Vitest** (`npm test` = `vitest run`, `npm run test:watch` = `vitest`).
 |----------------------------|--------------------------------------------------------------------|
 | `test/game.test.mjs`       | Connections, movements, colours, history (Vitest ESM format)       |
 | `test/stickman.test.mjs`   | Stickman rendering: pixel coordinates (Vitest ESM format)          |
+| `test/world.test.mjs`      | Pure helpers from `scene/world.js`: `findCubesWithNeighborBelow`   |
