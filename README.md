@@ -24,7 +24,7 @@ When you connect, you are assigned a random **Cube World character** with their 
 Use the movement buttons to animate your stickman:
 
 | Action | Effect |
-|--------|--------|
+| -------- | -------- |
 | Shake | Your character looks surprised |
 | Flip | Your character flips upside down |
 | Tilt | Your character gets disoriented |
@@ -43,7 +43,7 @@ There are **22 Cube World characters** across 5 series (2005–2008), each with 
 ## Development
 
 | Command | Description |
-|---------|-------------|
+| --------- | ------------- |
 | `npm start` | Start the server |
 | `npm test` | Run unit tests (Vitest) |
 | `npm run test:watch` | Run tests in watch mode |
