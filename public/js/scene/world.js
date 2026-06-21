@@ -90,6 +90,8 @@ export function renderWorld(sceneState, state, refs) {
   syncCubes(sceneState, cubes, refs);
   layoutCubes(sceneState, cubes);
 
+  updateLabelVisibilities(sceneState, cubes);
+
   cubes.forEach((cube) => {
     const node = sceneState.cubeNodes.get(cube.id);
     if (!node) return;
@@ -136,6 +138,44 @@ function startFlipAnimation(node, cube) {
       node._pendingCube = null;
     },
   });
+}
+
+/**
+ * For each cube that has a direct neighbour below (y+1), hides its label by
+ * default and reveals it only on hover. Restores full visibility otherwise.
+ *
+ * The label sits 76 px below the cube centre. With gapY=130 the neighbour's
+ * frame starts at 72 px below — the two overlap by ~20 px, so the label must
+ * be suppressed unless the user explicitly hovers.
+ *
+ * @param {SceneState} sceneState
+ * @param {Cube[]} cubes
+ */
+function updateLabelVisibilities(sceneState, cubes) {
+  const belowIds = findCubesWithNeighborBelow(cubes);
+  cubes.forEach((cube) => {
+    const node = sceneState.cubeNodes.get(cube.id);
+    if (!node) return;
+    node.updateHasCubeBelow(belowIds.has(cube.id));
+  });
+}
+
+/**
+ * Returns the set of cube ids that have another cube directly below them (y+1).
+ * Pure function — no side effects, no dependencies.
+ *
+ * @param {Array<{ id: string, x: number, y: number }>} cubes
+ * @returns {Set<string>}
+ */
+export function findCubesWithNeighborBelow(cubes) {
+  const positionMap = new Map(cubes.map((c) => [`${c.x},${c.y}`, c.id]));
+  const result = new Set();
+  cubes.forEach((cube) => {
+    if (positionMap.has(`${cube.x},${cube.y + 1}`)) {
+      result.add(cube.id);
+    }
+  });
+  return result;
 }
 
 /**

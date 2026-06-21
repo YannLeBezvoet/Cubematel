@@ -62,6 +62,8 @@ export class CubeNode {
     this.container.eventMode = "static";
     this.container.cursor = "pointer";
     this.container.on("pointertap", () => onSelect(id));
+    this.container.on("pointerenter", () => { this._hovered = true; this._syncLabelVisibility(); });
+    this.container.on("pointerleave", () => { this._hovered = false; this._syncLabelVisibility(); });
 
     /** @type {number} Current interpolated X (GSAP-managed) */
     this.x = 0;
@@ -79,6 +81,32 @@ export class CubeNode {
     this.flipping = false;
     /** @type {Cube | null} Cube state to apply after flip completes */
     this._pendingCube = null;
+    /** @type {boolean} True when another cube is directly below on the grid */
+    this._hasCubeBelow = false;
+    /** @type {boolean} True while the pointer is over this cube */
+    this._hovered = false;
+  }
+
+  /**
+   * Shows or hides the label/mood texts based on hover and neighbour state.
+   * Labels are always visible unless a cube sits directly below (overlapping
+   * area), in which case they are hidden until the user hovers over the cube.
+   */
+  _syncLabelVisibility() {
+    const visible = !this._hasCubeBelow || this._hovered;
+    this.label.visible = visible;
+    this.mood.visible = visible;
+  }
+
+  /**
+   * Updates whether a cube sits directly below this one on the grid.
+   * Hides the label by default when true; the label is revealed on hover.
+   *
+   * @param {boolean} hasCubeBelow
+   */
+  updateHasCubeBelow(hasCubeBelow) {
+    this._hasCubeBelow = hasCubeBelow;
+    this._syncLabelVisibility();
   }
 
   /**
